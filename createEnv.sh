@@ -23,3 +23,6 @@ java -jar /root/james-cli.jar  adduser james16@easysmpc.org 12345
 java -jar /root/james-cli.jar  adduser james17@easysmpc.org 12345
 java -jar /root/james-cli.jar  adduser james18@easysmpc.org 12345
 java -jar /root/james-cli.jar  adduser james19@easysmpc.org 12345
+# Start evaluation
+cd /root/easy-smpc
+/opt/jdk-14.0.2/bin/java -Dlog4j.configurationFile=org/bihealth/mi/easysmpc/nogui/log4j2.xml -jar easysmpc.eval.jar

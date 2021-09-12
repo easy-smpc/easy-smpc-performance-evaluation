@@ -6,7 +6,7 @@ RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
 # Copy files
 WORKDIR /root
 RUN ["mkdir", "./easy-smpc"]
-VOLUME ./easy-smpc
+VOLUME ["/root/easy-smpc"]
 COPY smtpserver.xml conf
 COPY createEnv.sh .
 COPY startup.sh .

@@ -1,5 +1,5 @@
 #!/bin/bash 
-docker run \
+sudo docker run \
     --rm \
     --name iredmail \
     --env-file iredmail-docker.conf \

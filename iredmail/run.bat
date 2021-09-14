@@ -1,5 +1,5 @@
 docker run ^
-    --rm ^
+    # --rm ^
     --name iredmail ^
     --env-file iredmail-docker.conf ^
 	--add-host=easysmpc.org:127.0.0.1 ^
@@ -24,4 +24,4 @@ docker run ^
     -v iredmail_clamav:/var/lib/clamav ^
     -v iredmail_sa_rules:/var/lib/spamassassin ^
     -v iredmail_postfix_queue:/var/spool/postfix ^
-    iredmail/mariadb:stable	
+    iredmail/mariadb:stable

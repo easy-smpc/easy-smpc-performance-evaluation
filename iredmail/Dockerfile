@@ -1,6 +1,6 @@
 FROM iredmail/mariadb:stable
 # Create volumes
-VOLUME "/root/easy-smpc"
+VOLUME /root/easy-smpc
 # Set environment var
 ENV HOSTNAME=easysmpc.org
 ENV FIRST_MAIL_DOMAIN=easysmpc.org
@@ -8,7 +8,7 @@ ENV FIRST_MAIL_DOMAIN_ADMIN_PASSWORD=12345
 ENV MLMMJADMIN_API_TOKEN=12345
 ENV ROUNDCUBE_DES_KEY=12345
 ENV USE_IREDAPD=NO
-#ENV USE_ANTISPAM=NO
+ENV USE_ANTISPAM=NO
 ENV USE_FAIL2BAN=NO
 ENV USE_ROUNDCUBE=NO
 ENV USE_IREDADMIN=NO
@@ -25,7 +25,6 @@ COPY dovecot.conf /etc/dovecot
 COPY main.cf /etc/postfix
 COPY master.cf /etc/postfix
 COPY ./ssl/* /opt/iredmail/ssl/
-COPY ./clamav/* /var/lib/clamav/
 COPY entrypoint.sh /
 
 # EXPOSE ports

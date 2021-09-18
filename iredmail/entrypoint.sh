@@ -6,7 +6,7 @@
 # please do __NOT__ modify it manually.
 #
 
-echo "127.0.0.1 easysmpc.org" >> /etc/hosts 
+echo "127.0.0.1 mail.easysmpc.org" >> /etc/hosts 
 ENTRYPOINTS_DIR="/docker/entrypoints"
 SETTINGS_CONF="${ENTRYPOINTS_DIR}/settings.conf"
 

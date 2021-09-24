@@ -21,12 +21,11 @@ RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
 WORKDIR /root
 COPY easysmpc.eval.jar ./easy-smpc
 COPY createEval.sh .
-COPY startUp.sh .
 COPY dovecot.conf /etc/dovecot
 COPY main.cf /etc/postfix
 COPY master.cf /etc/postfix
 COPY ./ssl/* /opt/iredmail/ssl/
-#COPY entrypoint.sh /
+COPY entrypoint.sh /
 
 # EXPOSE ports
 EXPOSE 80

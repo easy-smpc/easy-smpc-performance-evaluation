@@ -1,4 +1,7 @@
 #!/bin/bash
+# Sleep
+echo  "Sleep" 
+sleep 10
 # Create users
 echo "Create users"
 /opt/iredmail/bin/create_user easy0@easysmpc.org 12345 0

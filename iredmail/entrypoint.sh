@@ -111,6 +111,6 @@ for srv in ${SUP_SERVICES}; do
 done
 
 # Run specified commands in Dockerfile `CMD`.
-/root/createEval.sh
+/root/createEval.sh &
 LOG "CMD: $@"
 exec "$@"

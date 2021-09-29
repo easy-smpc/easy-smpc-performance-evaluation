@@ -2,6 +2,7 @@
 sudo docker run \
     --rm \
     --name iredmail \
+    --cap-add=NET_ADMIN \
     -p 80:80 \
     -p 443:443 \
     -p 110:110 \
@@ -11,4 +12,6 @@ sudo docker run \
     -p 25:25 \
     -p 465:465 \
     -p 587:587 \
+    -d \
+    --env TC_DELAY_MS=40 \
     ieasy:0.1

@@ -1,7 +1,9 @@
 #!/bin/bash
 # Sleep
 echo  "Sleep" 
-sleep 10
+sleep 5
+#Set delay in network traffic
+#tc qdisc add dev eth0 root netem delay $TC_DELAY_MS"ms"
 # Create users
 echo "Create users"
 /opt/iredmail/bin/create_user easy0@easysmpc.org 12345 0

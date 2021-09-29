@@ -5,10 +5,21 @@ Dim userName
 Dim password
 Dim number
 Dim numberUsers
+Dim fso
+Dim folderPath
+Dim obSSLCertificate
+Dim certFileName
+Dim privateKey
+Dim smptPort
+Dim imapPort
 domainName = "easysmpc.org" ' Name of domain
 userName = "easy" 'user name with an added index
 password = "12345" 'Pasword for admin and users
 numberUsers = 20
+certFileName = "cert.crt"
+privateKey = "key.key"
+smptPort = 465
+imapPort = 993
 
 
 ' Connect
@@ -61,3 +72,46 @@ Sub CreateUser(userName)
 	Set obAccounts = Nothing
 	Set obDomain = Nothing
 End sub
+
+' Get folder path
+Set fso = CreateObject("Scripting.FileSystemObject")
+folderPath = fso.GetAbsolutePathName("ssl") 
+
+' Set SSL certificate
+Set obSSLCertificate = obBaseApp.Settings.SSLCertificates.Add()
+obSSLCertificate.CertificateFile = folderPath & "\" & certFileName
+obSSLCertificate.PrivateKeyFile = folderPath & "\" & privateKey
+obSSLCertificate.Name = domainName
+obSSLCertificate.Save()
+If err.Number <> 0 Then
+	WScript.Echo "Error creating ssl certificate"
+	WScript.Quit
+end If
+
+' Add smtp port
+Set obSMTPPort = obBaseApp.Settings.TCPIPPorts.Add()
+obSMTPPort.portNumber = smptPort
+obSMTPPort.Protocol = 1
+obSMTPPort.SSLCertificateID = obSSLCertificate.ID
+obSMTPPort.UseSSL = true
+obSMTPPort.Save()
+If err.Number <> 0 Then
+	WScript.Echo "Error creating smpt port"
+	WScript.Quit
+end If
+
+
+' Add smtp port
+Set obIMAPPort = obBaseApp.Settings.TCPIPPorts.Add()
+obIMAPPort.portNumber = imapPort
+obIMAPPort.Protocol = 5
+obIMAPPort.SSLCertificateID = obSSLCertificate.ID
+obIMAPPort.UseSSL = true
+obIMAPPort.Save()
+If err.Number <> 0 Then
+	WScript.Echo "Error creating imap port"
+	WScript.Quit
+end If
+
+' Reload
+obBaseApp.Reinitialize()

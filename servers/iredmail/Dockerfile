@@ -1,6 +1,6 @@
 FROM iredmail/mariadb:stable
 # Create volumes
-VOLUME /root/easy-smpc
+#VOLUME /root/easy-smpc
 # Set environment var
 ENV HOSTNAME=mail.easysmpc.org
 ENV FIRST_MAIL_DOMAIN=easysmpc.org
@@ -16,17 +16,20 @@ ENV TC_DELAY_MS=40
 
 # Get JDK
 WORKDIR /opt
+RUN apt-get update && apt-get install -y dos2unix
 ADD https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz .
 RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
 # Copy files
 WORKDIR /root
 COPY easy-smpc-evaluation.jar ./easy-smpc
 COPY createEval.sh .
+RUN dos2unix createEval.sh
 COPY dovecot.conf /etc/dovecot
 COPY main.cf /etc/postfix
 COPY master.cf /etc/postfix
 COPY ./ssl/* /opt/iredmail/ssl/
 COPY entrypoint.sh /
+RUN dos2unix /entrypoint.sh
 
 # EXPOSE ports
 EXPOSE 80

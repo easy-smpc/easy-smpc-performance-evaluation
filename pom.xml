@@ -1,24 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>easy-smpc-performance-evaluation</groupId>
-  <artifactId>easy-smpc-performance-evaluation</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>easy-smpc-performance-evaluation</groupId>
+	<artifactId>easy-smpc-performance-evaluation</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
-<!-- 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<mainClass>org.bihealth.mi.easysmpc.nogui.PerformanceEvaluation</mainClass>
-				</configuration>
-			</plugin> -->
-			
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>exec-maven-plugin</artifactId> 
+				<version>3.0.0</version> <configuration> <mainClass>org.bihealth.mi.easysmpc.nogui.PerformanceEvaluation</mainClass> 
+				</configuration> </plugin> -->
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
@@ -27,7 +22,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>				
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
@@ -53,7 +48,12 @@
 			</plugin>
 		</plugins>
 	</build>
-	<dependencies>		
+	<dependencies>
+		<dependency>
+			<groupId>org.bihealth.mi</groupId>
+			<artifactId>easysmpc</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>

@@ -28,6 +28,6 @@ echo "Create users"
 /opt/iredmail/bin/create_user easy19@easysmpc.org 12345 0
 
 # Start evaluation
-echo "Start evaluation"
-cd /root/easy-smpc
-/opt/jdk-14.0.2/bin/java -Dlog4j.configurationFile=org/bihealth/mi/easysmpc/nogui/log4j2.xml -jar easysmpc.eval.jar
+#echo "Start evaluation"
+#cd /root/easy-smpc
+#/opt/jdk-14.0.2/bin/java -Dlog4j.configurationFile=org/bihealth/mi/easysmpc/nogui/log4j2.xml -jar easysmpc.eval.jar

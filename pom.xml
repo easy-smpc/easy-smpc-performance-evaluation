@@ -4,16 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>easy-smpc-performance-evaluation</groupId>
 	<artifactId>easy-smpc-performance-evaluation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>exec-maven-plugin</artifactId> 
-				<version>3.0.0</version> <configuration> <mainClass>org.bihealth.mi.easysmpc.nogui.PerformanceEvaluation</mainClass> 
-				</configuration> </plugin> -->
-
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
@@ -40,7 +36,7 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<finalName>${project.name}.eval</finalName>
+							<finalName>easy-smpc-evaluation</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
@@ -52,11 +48,21 @@
 		<dependency>
 			<groupId>org.bihealth.mi</groupId>
 			<artifactId>easysmpc</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>ISO-8859-1</project.reporting.outputEncoding>
 	</properties>
+	<repositories>
+		<repository>
+			<id>ProjectRepo</id>
+			<name>ProjectRepo</name>
+			<url>file://${project.basedir}/libs</url>
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+		</repository>
+	</repositories>
 </project>

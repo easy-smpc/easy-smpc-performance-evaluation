@@ -1,0 +1,8 @@
+#!/bin/bash 
+sudo docker run \
+	--rm \
+	--name easy-eval \
+	--cap-add=NET_ADMIN \
+	-d \
+	--env TC_DELAY_MS=40 \
+	easy-smpc-evaluation:0.1

@@ -61,7 +61,7 @@ public class PerformanceEvaluation implements ResultPrinter {
 		PerformanceTracker tracker = new PerformanceTracker();
 
 		// Create parameters
-		List<Integer> participants = new ArrayList<>(Arrays.asList(new Integer[] { 3 }));
+		List<Integer> participants = new ArrayList<>(Arrays.asList(new Integer[] { 20, 15, 10, 5, 3 }));
 		List<Integer> bins = new ArrayList<>(Arrays.asList(new Integer[] { 10000, 7500, 5000, 2500, 1000 }));
 		List<Integer> mailboxCheckInterval = new ArrayList<>(Arrays.asList(new Integer[] { 20000, 15000, 10000, 5000, 1000 }));
 		

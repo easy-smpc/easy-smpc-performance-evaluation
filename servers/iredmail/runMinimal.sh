@@ -4,5 +4,5 @@ sudo docker run \
 	--name easy-eval \
 	--cap-add=NET_ADMIN \
 	-d \
-	--env TC_DELAY_MS=40 \
+	--env TC_DELAY_MS=30 \
 	easy-smpc-evaluation:1.0

@@ -5,4 +5,4 @@ sudo docker run \
 	--cap-add=NET_ADMIN \
 	-d \
 	--env TC_DELAY_MS=40 \
-	easy-smpc-evaluation:0.1
+	easy-smpc-evaluation:1.0

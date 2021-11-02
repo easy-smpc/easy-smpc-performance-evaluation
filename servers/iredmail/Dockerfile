@@ -20,7 +20,7 @@ ADD https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647
 RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
 # Copy files
 WORKDIR /root
-COPY ../../target/easy-smpc-evaluation.jar ./easy-smpc
+COPY easy-smpc-evaluation.jar ./easy-smpc
 COPY createEval.sh .
 COPY dovecot.conf /etc/dovecot
 COPY main.cf /etc/postfix

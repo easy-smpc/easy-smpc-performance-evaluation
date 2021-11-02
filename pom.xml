@@ -12,9 +12,10 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.8.1</version>
 				<configuration>
-					<release>14</release>
+					          <source>14</source>
+					          <target>14</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -61,7 +62,7 @@
 			<name>ProjectRepo</name>
 			<url>file://${project.basedir}/libs</url>
 			<releases>
-				<checksumPolicy>fail</checksumPolicy>
+				<checksumPolicy>warn</checksumPolicy>
 			</releases>
 		</repository>
 	</repositories>

@@ -14,14 +14,17 @@ ENV USE_ROUNDCUBE=NO
 ENV USE_IREDADMIN=NO
 ENV TC_DELAY_MS=40
 
+# Install
+RUN apt-get update && apt-get install -y dos2unix
+
 # Get JDK
 WORKDIR /opt
-RUN apt-get update && apt-get install -y dos2unix
 ADD https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz .
 RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
+
 # Copy files
 WORKDIR /root
-COPY easy-smpc-evaluation.jar ./easy-smpc
+COPY easy-smpc-evaluation.jar ./easy-smpc/easy-smpc-evaluation.jar
 COPY createEval.sh .
 RUN dos2unix createEval.sh
 COPY dovecot.conf /etc/dovecot

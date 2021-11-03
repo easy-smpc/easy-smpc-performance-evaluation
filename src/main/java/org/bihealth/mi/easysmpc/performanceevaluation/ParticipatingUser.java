@@ -16,6 +16,8 @@ package org.bihealth.mi.easysmpc.performanceevaluation;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -189,17 +191,23 @@ public class ParticipatingUser extends User {
         try {
             // Get data
             String data = Message.deserializeMessage((String) message.getMessage()).data;
-
+            
             // Init model
+            Instant start = Instant.now();
             setModel(MessageInitial.getAppModel(MessageInitial.decodeMessage(Message.getMessageData(data))));
             getModel().setConnectionIMAPSettings(this.connectionIMAPSettings);
 
             // Proceed to entering value
             getModel().toEnteringValues(data);
-
+            Instant end = Instant.now();
+            logger.debug("Duration logged", new Date(), "Init and set to entering values finished", "Activity took", Duration.between(start, end).toSeconds());
+            
             // Set own values and proceed
+            start = Instant.now();
             getModel().toSendingShares(fillBins(lengthNumber));
-
+            end = Instant.now();
+            logger.debug("Duration logged", new Date(), "So sending shared finished", "Activity took", Duration.between(start, end).toSeconds());
+            
             // Starts the common steps 
             proceedCommonProcessSteps();
 

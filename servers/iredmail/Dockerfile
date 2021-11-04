@@ -24,7 +24,7 @@ RUN ["tar", "-xf", "openjdk-14.0.2_linux-x64_bin.tar.gz"]
 
 # Copy files
 WORKDIR /root
-COPY easy-smpc-evaluation.jar ./easy-smpc/easy-smpc-evaluation.jar
+COPY easy-smpc-performance-evaluation-1.0.jar ./easy-smpc/easy-smpc-performance-evaluation-1.0.jar
 COPY createEval.sh .
 RUN dos2unix createEval.sh
 COPY dovecot.conf /etc/dovecot

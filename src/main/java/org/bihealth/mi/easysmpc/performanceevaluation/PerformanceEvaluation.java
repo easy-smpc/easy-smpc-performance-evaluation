@@ -154,7 +154,8 @@ public class PerformanceEvaluation implements ResultPrinter {
 		// Set logging properties from file
 		System.setProperty("log4j2.configurationFile", "src/main/resources/org/bihealth/mi/easysmpc/nogui/log4j2.xml");
 		logger = LogManager.getLogger(PerformanceEvaluation.class);
-
+		logger.debug("Started preparation logged", new Date(), "Started preparation");
+		
 		// Delete existing e-mails relevant to EasySMPC
 		for (ConnectionIMAPSettings connectionIMAPSettings : mailBoxDetails.getAllConnections()) {
 			BusEmail bus = new BusEmail(new ConnectionIMAP(connectionIMAPSettings, false), 1000);

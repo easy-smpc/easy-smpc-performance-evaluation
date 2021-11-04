@@ -271,14 +271,11 @@ public boolean isStudyStateNone() {
             
             // Wait
             try {
-                Thread.sleep(2000);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 logger.error("Interrupted exception logged", new Date(), "Interrupted exception logged", ExceptionUtils.getStackTrace(e));
             }             
-        }
-        
-        // Stop bus
-        getModel().stopBus();        
+        }     
     }
     
     /** 
@@ -296,7 +293,7 @@ public boolean isStudyStateNone() {
 
                 try {
                     // Retrieve bus and send message
-                    FutureTask<Void> future = getModel().getBus(0, this.isSharedMailbox).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
+                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, this.isSharedMailbox).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
                                     new Scope(getModel().getStudyUID() + (getModel().getState() == StudyState.INITIAL_SENDING ? ROUND_0 : roundIdentifier)),
                                     new org.bihealth.mi.easybus.Participant(getModel().getParticipants()[index].name,
                                                                             getModel().getParticipants()[index].emailAddress));

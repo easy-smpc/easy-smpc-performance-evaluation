@@ -56,6 +56,10 @@ public class PerformanceEvaluation implements ResultPrinter {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws Exception {
+	    
+	    // Output start message
+        System.out.println("Performance evaluation started");
+        System.out.println("For results see /root/easy-smpc/performanceEvaluation.csv");
 
 		// Performance tracking
 		PerformanceTracker tracker = new PerformanceTracker();
@@ -139,8 +143,6 @@ public class PerformanceEvaluation implements ResultPrinter {
 	 */
 	private void prepare(MailboxDetails mailBoxDetails) throws IOException, BusException, InterruptedException {
 		
-		// Set logging properties from file
-		System.setProperty("log4j2.configurationFile", "src/main/resources/org/bihealth/mi/easysmpc/performanceevaluation/log4j2.xml");
 		logger = LogManager.getLogger(PerformanceEvaluation.class);
 		logger.debug("Started preparation logged", new Date(), "Started preparation");
 		

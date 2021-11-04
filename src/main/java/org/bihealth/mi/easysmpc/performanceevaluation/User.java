@@ -220,8 +220,9 @@ public boolean isStudyStateNone() {
             this.model.toRecievingResult();
             logger.debug("2. round sending finished logged", new Date(), getModel().getStudyUID(), "2. round sending finished for", getModel().getOwnId());
             
-            // Receives the messages for the second round and finalizes the model
-            receiveMessages(Resources.ROUND_2);            
+            // Receives the messages for the second round, stops the bus and finalizes the model
+            receiveMessages(Resources.ROUND_2);
+            getModel().stopBus();        
             recording.finished(this.model.getOwnId(), System.nanoTime());
             this.model.toFinished();
             logger.debug("Result logged", new Date(), getModel().getStudyUID(), "result", getModel().getOwnId(), "participantid", getModel().getAllResults()[0].name, "result name", getModel().getAllResults()[0].value, "result");

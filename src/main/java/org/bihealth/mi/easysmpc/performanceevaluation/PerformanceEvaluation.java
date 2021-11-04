@@ -71,9 +71,6 @@ public class PerformanceEvaluation implements ResultPrinter {
 		// Repeat each parameter combinations 15 times
 		int repetitionsPerCombination = 15;
 		
-		// Wait after a complete EasySMPC round 1000 ms before start the next
-		int waitTime = 1000;
-		
 		// Create combinator
 		Combinator combinator = new RepeatPermuteCombinator(participants, bins, mailboxCheckInterval, repetitionsPerCombination);
 
@@ -87,7 +84,7 @@ public class PerformanceEvaluation implements ResultPrinter {
 		MailboxDetails mailBoxDetails = new MailboxDetails(isSharedMailbox, connectionIMAPSettings, participants, tracker);
 
         // Call evaluation
-        new PerformanceEvaluation(combinator, mailBoxDetails, waitTime);
+        new PerformanceEvaluation(combinator, mailBoxDetails);
 	}
 
 	/**
@@ -95,10 +92,9 @@ public class PerformanceEvaluation implements ResultPrinter {
 	 * @param bins
 	 * @param mailboxCheckIntervals
 	 * @param mailBoxDetails
-	 * @param waitTime between two repetition/EasySMPC processes
 	 * @throws IOException
 	 */
-	public PerformanceEvaluation(Combinator combinator, MailboxDetails mailBoxDetails, int waitTime) throws IOException {
+	public PerformanceEvaluation(Combinator combinator, MailboxDetails mailBoxDetails) throws IOException {
 	    
         // Prepare
         try {
@@ -128,12 +124,7 @@ public class PerformanceEvaluation implements ResultPrinter {
             mailBoxDetails.getTracker().resetStatistics();
 
             // Wait
-            logger.debug("Wait logged", new Date(), "Started waiting for", waitTime);
-            try {
-                Thread.sleep(waitTime);
-            } catch (InterruptedException e) {
-                logger.error("Interrupted exception logged", new Date(), "Interrupted exception logged", ExceptionUtils.getStackTrace(e));
-            }
+            logger.debug("Process finished logged", new Date(), "Process finished!");
         }
 	}
 

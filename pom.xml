@@ -6,6 +6,16 @@
 	<artifactId>easy-smpc-performance-evaluation</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
+		<repositories>
+		<repository>
+			<id>ProjectRepo</id>
+			<name>ProjectRepo</name>
+			<url>file://${project.basedir}/libs</url>
+			<releases>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
+	</repositories>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
@@ -64,14 +74,4 @@
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>ISO-8859-1</project.reporting.outputEncoding>
 	</properties>
-	<repositories>
-		<repository>
-			<id>ProjectRepo</id>
-			<name>ProjectRepo</name>
-			<url>file://${project.basedir}/libs</url>
-			<releases>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-		</repository>
-	</repositories>
 </project>

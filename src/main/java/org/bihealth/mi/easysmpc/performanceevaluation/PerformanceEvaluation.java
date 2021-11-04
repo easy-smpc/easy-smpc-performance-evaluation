@@ -147,12 +147,9 @@ public class PerformanceEvaluation implements ResultPrinter {
 	 * @throws InterruptedException
 	 */
 	private void prepare(MailboxDetails mailBoxDetails) throws IOException, BusException, InterruptedException {
-
-		// Set log4j also as log manager also for Java utility logging
-		System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
 		
 		// Set logging properties from file
-		System.setProperty("log4j2.configurationFile", "src/main/resources/org/bihealth/mi/easysmpc/nogui/log4j2.xml");
+		System.setProperty("log4j2.configurationFile", "src/main/resources/org/bihealth/mi/easysmpc/performanceevaluation/log4j2.xml");
 		logger = LogManager.getLogger(PerformanceEvaluation.class);
 		logger.debug("Started preparation logged", new Date(), "Started preparation");
 		

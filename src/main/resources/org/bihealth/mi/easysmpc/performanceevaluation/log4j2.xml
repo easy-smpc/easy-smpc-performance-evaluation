@@ -6,7 +6,7 @@
 	</Properties>
 
 	<Appenders>
-		<RollingFile name="fileLogger" fileName="easySMPC.log"
+		<RollingFile name="fileLogger" fileName="easy-smpc.log"
 			filePattern="easySMPC-%i.log">
 			<CsvParameterLayout delimiter=";" />
 			<Policies>
@@ -14,14 +14,6 @@
 			</Policies>
 			<DefaultRolloverStrategy max="50" />
 		</RollingFile>
-
-		<RollingFile name="imapFileLogger" fileName="imap.log"
-			filePattern="imap-%i.log">
-			<Policies>
-				<SizeBasedTriggeringPolicy size="50MB" />
-			</Policies>
-		</RollingFile>
-
 
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout>

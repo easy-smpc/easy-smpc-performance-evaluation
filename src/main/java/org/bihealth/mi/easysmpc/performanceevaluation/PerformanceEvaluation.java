@@ -42,7 +42,7 @@ import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
  */
 public class PerformanceEvaluation implements ResultPrinter {
 	/** File path */
-	private static final String FILEPATH = "performanceEvaluation";
+	private static final String FILEPATH = "performanceEvaluation.csv";
 	/** CSV printer */
 	private CSVPrinter csvPrinter;
 	/** Logger */

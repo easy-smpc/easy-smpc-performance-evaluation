@@ -109,11 +109,11 @@ public class CreatingUser extends User {
     /**
      * Create participants
      * 
-     * @param lengthBitBigInteger
+     * @param bitLengthNumber
      * @param separatedProcesses
      * @param connectionIMAPSettings 
      */
-    private void createParticipants(int lengthBitBigInteger,
+    private void createParticipants(int bitLengthNumber,
                                     MailboxDetails mailBoxDetails) {
         // Loop over participants
         for(int index = 1; index < getModel().getNumParticipants(); index++) {
@@ -122,7 +122,7 @@ public class CreatingUser extends User {
                                   getModel().getParticipants()[index],
                                   index,
                                   mailBoxDetails.getConnection(index),
-                                  lengthBitBigInteger,
+                                  bitLengthNumber,
                                   getMailboxCheckInterval(),
                                   mailBoxDetails.isSharedMailbox(),
                                   getRecording());
@@ -139,20 +139,20 @@ public class CreatingUser extends User {
      * @param numberBins number of bins
      * @param numberParties number of involved parties/users
      * @param stringLength length of bin name
-     * @param bigIntegerBitLength length of generated big integer
+     * @param bitLengthNumber length of generated big integer
      * @return
      */
     protected Bin[] generateBins(int numberBins,
                                  int numberParties,
                                  int stringLength,
-                                 int bigIntegerBitLength) {
+                                 int bitLengthNumber) {
         // Init result bin array
         Bin[] result = new Bin[numberBins];
         
         // Init each bin and set generated secret value of creating user
         for (int index = 0; index < numberBins; index++) {
             result[index] = new Bin(generateRandomString(stringLength), numberParties);
-            result[index].shareValue(generateRandomBigDecimal(bigIntegerBitLength), Resources.FRACTIONAL_BITS);
+            result[index].shareValue(generateRandomBigDecimal(bitLengthNumber), Resources.FRACTIONAL_BITS);
         }
         
         // Return

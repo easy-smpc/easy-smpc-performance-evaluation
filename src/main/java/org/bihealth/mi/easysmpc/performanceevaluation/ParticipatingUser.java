@@ -74,7 +74,7 @@ public class ParticipatingUser extends User {
          * @param ownParticipant
          * @param participantId
          * @param connectionIMAPSettings
-         * @param lengthBitBigInteger
+         * @param bitLengthNumber
          * @param mailBoxCheckInterval
          * @param isSharedMailbox
          * @param recording 
@@ -83,7 +83,7 @@ public class ParticipatingUser extends User {
                                      Participant ownParticipant,
                                      int participantId,
                                      ConnectionIMAPSettings connectionIMAPSettings,
-                                     int lengthBitBigInteger,
+                                     int bitLengthNumber,
                                      int mailBoxCheckInterval,
                                      boolean isSharedMailbox, RecordTimeDifferences recording) {
             // Store
@@ -91,7 +91,7 @@ public class ParticipatingUser extends User {
             this.ownParticipant = ownParticipant;
             this.participantId = participantId;
             this.connectionIMAPSettings = connectionIMAPSettings;
-            this.lengthGeneratedNumbers = lengthBitBigInteger;
+            this.lengthGeneratedNumbers = bitLengthNumber;
             this.mailBoxCheckInterval = mailBoxCheckInterval;
             this.isSharedMailbox = isSharedMailbox;
             this.recording = recording;
@@ -151,7 +151,7 @@ public class ParticipatingUser extends User {
 
                                             @Override
                                             public void receiveError(Exception e) {
-                                                logger.error("Error receiveing e-mails logged", new Date(), "Error receiveing e-mails" ,ExceptionUtils.getStackTrace(e));
+                                                logger.error("Error receiveing e-mails logged", new Date(), "Error receiving e-mails" ,ExceptionUtils.getStackTrace(e));
                                             }
                                         });
         } catch (BusException e) {
@@ -163,16 +163,16 @@ public class ParticipatingUser extends User {
     /**
      * Fills the bins with random numbers
      * 
-     * @param lengthBitBigInteger
+     * @param bitLengthNumber
      * @return
      */
-    private BigDecimal[] fillBins(int lengthBitBigInteger) {
+    private BigDecimal[] fillBins(int bitLengthNumber) {
         // Init
         BigDecimal[] result = new BigDecimal[getModel().getBins().length];
         
         // Set a random big integer for each
         for (int index = 0; index < result.length; index++) {
-            result[index] = generateRandomBigDecimal(lengthBitBigInteger);
+            result[index] = generateRandomBigDecimal(bitLengthNumber);
         }
         
         // Return

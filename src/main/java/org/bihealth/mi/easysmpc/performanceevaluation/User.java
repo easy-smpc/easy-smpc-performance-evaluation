@@ -49,7 +49,7 @@ public abstract class User implements MessageListener {
     private static Logger logger;
     /** The length of a generated string */
     public final int FIXED_LENGTH_STRING = 10;
-    /** The length of a generated number before the comma */
+    /** The length of a generated number before the point */
     public final int FIXED_LENGTH_BIT_NUMBER = 31;
     /** Round for initial e-mails */
     public final String ROUND_0 = "_round0";       

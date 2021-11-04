@@ -30,4 +30,4 @@ echo "Create users"
 # Start evaluation
 echo "Start evaluation"
 cd /root/easy-smpc
-/opt/jdk-14.0.2/bin/java -Dlog4j.configurationFile=org/bihealth/mi/easysmpc/nogui/log4j2.xml -jar easy-smpc-evaluation.jar
+/opt/jdk-14.0.2/bin/java -Dlog4j.configurationFile=org/bihealth/mi/easysmpc/performanceevaluation/log4j2.xml -jar easy-smpc-evaluation.jar

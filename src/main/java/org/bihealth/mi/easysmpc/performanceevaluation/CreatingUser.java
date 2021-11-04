@@ -14,8 +14,6 @@
 package org.bihealth.mi.easysmpc.performanceevaluation;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,14 +60,10 @@ public class CreatingUser extends User {
             // Set model to starting
             getModel().toStarting();          
             
-            Instant start = Instant.now();
             // Init model with generated study name, participants and bins 
             getModel().toInitialSending(generateRandomString(FIXED_LENGTH_STRING),
                                         generateParticpants(numberParticipants, mailBoxDetails, FIXED_LENGTH_STRING),
                                         generateBins(numberBins,numberParticipants, FIXED_LENGTH_STRING, FIXED_LENGTH_BIT_NUMBER), mailBoxDetails.getConnection(0));
-            Instant end = Instant.now();
-            logger.debug("Duration logged", new Date(), "Initial sending finished", "Activity took", Duration.between(start, end).toSeconds());
-            
             // Init recoding
             setRecording(new RecordTimeDifferences(getModel(), mailBoxCheckInterval, System.nanoTime(), mailBoxDetails.getTracker(), printer));
         } catch (IOException | IllegalStateException e) {

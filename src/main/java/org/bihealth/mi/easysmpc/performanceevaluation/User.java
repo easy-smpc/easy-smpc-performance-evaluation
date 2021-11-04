@@ -18,8 +18,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.FutureTask;
@@ -209,33 +207,24 @@ public boolean isStudyStateNone() {
         try {
             // Sends the messages for the first round and proceeds the model
             sendMessages(Resources.ROUND_1);
-            Instant start = Instant.now();
             this.model.toRecievingShares();
-            Instant end = Instant.now();            
-            logger.debug("1. round sending finished logged", new Date(), getModel().getStudyUID(), "1. round sending finished for", getModel().getOwnId(), "Activity took", Duration.between(start, end).toSeconds());
+            logger.debug("1. round sending finished logged", new Date(), getModel().getStudyUID(), "1. round sending finished for", getModel().getOwnId());
             
             // Receives the messages for the first round and proceeds the model
             receiveMessages(Resources.ROUND_1);
-            
-            start = Instant.now();
             this.model.toSendingResult();
-            end = Instant.now();
-            logger.debug("1. round receiving finished logged", new Date(), getModel().getStudyUID(), "1. round receiving finished for", getModel().getOwnId(), "Activity took", Duration.between(start, end).toSeconds());
+            logger.debug("1. round receiving finished logged", new Date(), getModel().getStudyUID(), "1. round receiving finished for", getModel().getOwnId());
             
             // Sends the messages for the second round and proceeds the model
             sendMessages(Resources.ROUND_2);
-            start = Instant.now();
             this.model.toRecievingResult();
-            end = Instant.now();
-            logger.debug("2. round sending finished logged", new Date(), getModel().getStudyUID(), "2. round sending finished for", getModel().getOwnId(), "Activity took", Duration.between(start, end).toSeconds());
+            logger.debug("2. round sending finished logged", new Date(), getModel().getStudyUID(), "2. round sending finished for", getModel().getOwnId());
             
             // Receives the messages for the second round and finalizes the model
             receiveMessages(Resources.ROUND_2);            
             recording.finished(this.model.getOwnId(), System.nanoTime());
-            start = Instant.now();
             this.model.toFinished();
-            end = Instant.now();
-            logger.debug("Result logged", new Date(), getModel().getStudyUID(), "result", getModel().getOwnId(), "participantid", getModel().getAllResults()[0].name, "result name", getModel().getAllResults()[0].value, "result", "Activity took", Duration.between(start, end).toSeconds());
+            logger.debug("Result logged", new Date(), getModel().getStudyUID(), "result", getModel().getOwnId(), "participantid", getModel().getAllResults()[0].name, "result name", getModel().getAllResults()[0].value, "result");
             
         } catch (IllegalStateException | IllegalArgumentException | IOException | BusException e) {
             logger.error("Unable to process common process steps logged", new Date(), "Unable to process common process steps", ExceptionUtils.getStackTrace(e));
@@ -246,7 +235,7 @@ public boolean isStudyStateNone() {
     @Override
     public void receive(org.bihealth.mi.easybus.Message message) {
         String messageStripped = ImportClipboard.getStrippedExchangeMessage((String) message.getMessage());
-        Instant start = Instant.now();
+        
         // Check if valid
         if (isMessageShareResultValid(messageStripped)) {
             try {
@@ -256,8 +245,6 @@ public boolean isStudyStateNone() {
                 logger.error("Unable to digest message logged", new Date(), "Unable to digest message", ExceptionUtils.getStackTrace(e));
             }
         }
-        Instant end = Instant.now();
-        logger.debug("Receiving finished logged", new Date(),"Receiving finished", "Activity took", Duration.between(start, end).toSeconds());
     }
     
     /**
@@ -301,7 +288,6 @@ public boolean isStudyStateNone() {
      */
     private void sendMessages(String roundIdentifier) {
         
-        Instant start = Instant.now();
         // Loop over participants
         for (int index = 0; index < getModel().getNumParticipants(); index++) {
             
@@ -326,8 +312,6 @@ public boolean isStudyStateNone() {
                 }
             }
         }
-        Instant end = Instant.now();
-        logger.debug("Sent logged", new Date(), "Sent finished", "Acitvity took", Duration.between(start, end).toSeconds());
     }
     
     /**

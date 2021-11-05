@@ -17,8 +17,8 @@
 ## Steps to reproduce the performance evaluation manually
 
 **FW:** Überhaupt machen oder löschen?
-1. Clone this repository with the command clone https://github.com/fnwirth/easy-smpc-performance-evaluation.
-1. Build the program with the command mvn clean package. The two warnings regarding the import of easy-smpc.jar can be ignored.
+1. Clone this repository with the command `clone https://github.com/fnwirth/easy-smpc-performance-evaluation`.
+1. Build the program with the command `mvn clean package`. The two warnings regarding the import of easy-smpc.jar can be ignored.
 1. Install hMailServer on Windows as described in the [documentation](https://www.hmailserver.com/documentation/latest/?page=howto_install). All defaults can be accepted (e.g., the proposed data base).
 1. Change to the folder *servers/hMail* and execute the script `createDomainAndUsers.vbs` to set up the server.
 1. Execute the script `startEvaluation.sh`.

@@ -25,18 +25,20 @@ import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
  * Stores the mailbox connections details
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
-public class MailboxDetails {
+public class PerformanceMailboxSettings {
+
     /** Replace this by index */
-    public static final String INDEX_REPLACE = "REPLACE";
+    public static final String           INDEX_REPLACE = "REPLACE";
+    
     /** Use several or exactly one mail box for the bus */
-    private boolean isSharedMailbox;
+    private boolean                      isSharedMailbox;
     /** Template to create ConnectionIMAPSettings */
     private final ConnectionIMAPSettings connectionIMAPTemplate;
-    /** Max participants*/
-    private Integer maxParticipants;
-    /** Tracker*/
+    /** Max participants */
+    private Integer                      maxParticipants;
+    /** Tracker */
     private transient PerformanceTracker tracker;
 
     /**
@@ -47,7 +49,7 @@ public class MailboxDetails {
      * @param participants
      * @param tracker
      */
-    public MailboxDetails(boolean isSharedMailbox, ConnectionIMAPSettings connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {
+    public PerformanceMailboxSettings(boolean isSharedMailbox, ConnectionIMAPSettings connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {
         
         // Check index replace index is provided        
         if(!isSharedMailbox && !connectionIMAPTemplate.getEmailAddress().contains(INDEX_REPLACE )) {

@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -41,53 +40,135 @@ import de.tu_darmstadt.cbs.emailsmpc.Study.StudyState;
  * A user in an EasySMPC process
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
 public abstract class User implements MessageListener {
-    
+
     /** Logger */
-    private static Logger logger;
+    private static final Logger        LOGGER                  = LogManager.getLogger(User.class);
     /** The length of a generated string */
-    public final int FIXED_LENGTH_STRING = 10;
+    public static final int            FIXED_LENGTH_STRING     = 10;
     /** The length of a generated number before the point */
-    public final int FIXED_LENGTH_BIT_NUMBER = 31;
+    public static final int            FIXED_LENGTH_BIT_NUMBER = 31;
     /** Round for initial e-mails */
-    public final String ROUND_0 = "_round0";       
+    public static final String         ROUND_0                 = "_round0";
+    
     /** The study model */
-    private Study model = new Study();
+    private Study                      model                   = new Study();
     /** The random object */
-    private final SecureRandom randomGenerator = new SecureRandom();
-    /** The mailbox check interval in  milliseconds */
-    private final int mailBoxCheckInterval;
+    private final SecureRandom         randomGenerator         = new SecureRandom();
+    /** The mailbox check interval in milliseconds */
+    private final int                  mailBoxCheckInterval;
     /** Is shared mailbox used? */
-    private boolean isSharedMailbox;
+    private PerformanceMailboxSettings mailboxSettings;
     /** Store the time differences */
-    private RecordTimeDifferences recording;
+    private PerformanceRecorder        recording;
+    /** Printer */
+    private PerformanceResultPrinter   printer;
+
+    /**
+     * Creates a new instance for creating users
+     * 
+     * @param mailboxCheckInterval
+     * @param mailboxSettings 
+     * @param printer
+     */
+    public User(int mailboxCheckInterval,
+                PerformanceMailboxSettings mailboxSettings,
+                PerformanceResultPrinter printer) {
+        
+        this.mailBoxCheckInterval = mailboxCheckInterval;
+        this.mailboxSettings = mailboxSettings;
+        this.printer = printer;
+        this.recording = new PerformanceRecorder(model);
+     }
+
+    /**
+     * Creates a new instance for participating users
+     * 
+     * @param other
+     */
+    public User(User other) {
+        
+        this.mailBoxCheckInterval = other.mailBoxCheckInterval;
+        this.mailboxSettings = other.mailboxSettings;
+        this.printer = other.printer;
+        this.recording = other.recording;
+     }
     
     /**
-     * Creates a new instance
-     *  
-     * @param mailBoxCheckInterval
-     * @param isSharedMailbox
-     * @param recording
+     * @return the mailBoxCheckInterval
      */
-    User(int mailBoxCheckInterval, boolean isSharedMailbox, RecordTimeDifferences recording) {
-        this(mailBoxCheckInterval, isSharedMailbox);
-        this.recording = recording;
+    public int getMailboxCheckInterval() {
+        return mailBoxCheckInterval;
     }
     
     /**
-     * Creates a new instance
-     * 
-     * @param mailBoxCheckInterval
-     * @param recordTimeDifferences 
+     * Returns the mailbox settings
+     * @return
      */
-    User(int mailBoxCheckInterval, boolean isSharedMailbox) {
-        this.mailBoxCheckInterval = mailBoxCheckInterval;
-        this.isSharedMailbox = isSharedMailbox;
-        logger = LogManager.getLogger(User.class);        
-     }
+    public PerformanceMailboxSettings getMailboxSettings() {
+        return mailboxSettings;
+    }
     
+    /**
+     * Gets the model
+     * 
+     * @return the model
+     */
+    public Study getModel() {
+        return model;
+    }
+
+
+    /**
+     * Returns the recording
+     * 
+     * @return
+     */
+    public PerformanceRecorder getRecorder() {
+        return recording;
+    }
+
+    /**
+     * Is the process finished?
+     * 
+     * @return
+     */
+    public boolean isProcessFinished() {
+        return getModel().getState() == StudyState.FINISHED;
+    }
+
+    /**
+     * @return is a shared mailbox used?
+     */
+    public boolean isSharedMailbox() {
+        return mailboxSettings.isSharedMailbox();
+    }
+    
+    @Override
+    public void receive(org.bihealth.mi.easybus.Message message) {
+        String messageStripped = ImportClipboard.getStrippedExchangeMessage((String) message.getMessage());
+        
+        // Check if valid
+        if (isMessageShareResultValid(messageStripped)) {
+            try {
+                // Set message
+                model.setShareFromMessage(Message.deserializeMessage(messageStripped));
+            } catch (IllegalStateException | IllegalArgumentException | NoSuchAlgorithmException | ClassNotFoundException | IOException e) {
+                LOGGER.error("Unable to digest message logged", new Date(), "Unable to digest message", ExceptionUtils.getStackTrace(e));
+            }
+        }
+    }
+    
+    @Override
+    public void receiveError(Exception e) {
+        LOGGER.error("Error receiveing e-mails logged",
+                     new Date(),
+                     "Error receiveing e-mails",
+                     ExceptionUtils.getStackTrace(e));
+    }
+
     /**
      * Are shares complete to proceed?
      * 
@@ -99,153 +180,67 @@ public abstract class User implements MessageListener {
         }
         return true;
     }
-    
-    /**
-     * Generates a random big decimal
-     * 
-     * @param bit length of big decimal before comma
-     * @return
-     * @throws IllegalArgumentException
-     */
-    protected BigDecimal generateRandomBigDecimal(int bitLength) throws IllegalArgumentException {
-        // Check
-        if (bitLength < 2) throw new IllegalArgumentException("Bitlength must be larger than 2");
-        
-        // Random integer
-        BigDecimal value =  new BigDecimal(new BigInteger(bitLength, randomGenerator));
-        
-        // Swap sign? 
-        byte[] randomByte = new byte[1];
-        randomGenerator.nextBytes(randomByte);
-        int signum = Byte.valueOf(randomByte[0]).intValue() & 0x01;
-        if (signum == 1) value = value.negate();
-        
-        // Return
-        return value;
-      }
-
-
-    /**
-     * Generates a string with random letters
-     * 
-     * @param string length
-     * @return generated string
-     */
-    protected String generateRandomString(int stringLength) {
-        
-        // Generates and returns a letter  between "a" (97) and "z" (122)        
-        return  new Random().ints(97, 122 + 1)
-                .limit(stringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-    }
-
-    /**
-     * @return the mailBoxCheckInterval
-     */
-    public int getMailboxCheckInterval() {
-        return mailBoxCheckInterval;
-    }
-    
-    /**
-     * Gets the model
-     * 
-     * @return the model
-     */
-    public Study getModel() {
-        return model;
-    }
-    
-    /**
-	   * Check whether message is valid
-	   * 
-	   * @param text
-	   * @return
-	   */
-	    public boolean isMessageShareResultValid(String text) {
-	        // Check not null or empty
-	        if (model == null || text == null || text.trim().isEmpty()) { return false; }
-	        
-	        // Check message
-	        try {
-	            return model.isMessageShareResultValid(Message.deserializeMessage(text));
-	        } catch (Exception e) {
-	            return false;
-	        }
-	    }
-    
-    /**
-     * Is the process finished?
-     * 
-     * @return
-     */
-    public boolean isProcessFinished() {
-        return getModel().getState() == StudyState.FINISHED;
-    }
-    
-    /**
-     * @return is a shared mailbox used?
-     */
-    public boolean isSharedMailbox() {
-        return isSharedMailbox;
-    }
-  
-  /**
- * Is study state none?
- * 
- * @return
- */
-public boolean isStudyStateNone() {
-    return (getModel() == null || getModel().getState() == null || getModel().getState() == StudyState.NONE);
-}
   
     /**
-     * Proceeds the SMPC steps which are the same for participating and creating user
+     * Check whether message is valid
+     * 
+     * @param text
+     * @return
      */
-    protected void proceedCommonProcessSteps() {
-        
+    private boolean isMessageShareResultValid(String text) {
+        // Check not null or empty
+        if (model == null || text == null || text.trim().isEmpty()) { return false; }
+
+        // Check message
         try {
-            // Sends the messages for the first round and proceeds the model
-            sendMessages(Resources.ROUND_1);
-            this.model.toRecievingShares();
-            logger.debug("1. round sending finished logged", new Date(), getModel().getStudyUID(), "1. round sending finished for", getModel().getOwnId());
-            
-            // Receives the messages for the first round and proceeds the model
-            receiveMessages(Resources.ROUND_1);
-            this.model.toSendingResult();
-            logger.debug("1. round receiving finished logged", new Date(), getModel().getStudyUID(), "1. round receiving finished for", getModel().getOwnId());
-            
-            // Sends the messages for the second round and proceeds the model
-            sendMessages(Resources.ROUND_2);
-            this.model.toRecievingResult();
-            logger.debug("2. round sending finished logged", new Date(), getModel().getStudyUID(), "2. round sending finished for", getModel().getOwnId());
-            
-            // Receives the messages for the second round, stops the bus and finalizes the model
-            receiveMessages(Resources.ROUND_2);
-            getModel().stopBus();
-            recording.finished(this.model.getOwnId(), System.nanoTime());
-            this.model.toFinished();
-            logger.debug("Result logged", new Date(), getModel().getStudyUID(), "result", getModel().getOwnId(), "participantid", getModel().getAllResults()[0].name, "result name", getModel().getAllResults()[0].value, "result");
-            
-        } catch (IllegalStateException | IllegalArgumentException | IOException | BusException e) {
-            logger.error("Unable to process common process steps logged", new Date(), "Unable to process common process steps", ExceptionUtils.getStackTrace(e));
-            throw new IllegalStateException("Unable to process common process steps", e);
+            return model.isMessageShareResultValid(Message.deserializeMessage(text));
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    @Override
-    public void receive(org.bihealth.mi.easybus.Message message) {
-        String messageStripped = ImportClipboard.getStrippedExchangeMessage((String) message.getMessage());
-        
-        // Check if valid
-        if (isMessageShareResultValid(messageStripped)) {
-            try {
-                // Set message
-                model.setShareFromMessage(Message.deserializeMessage(messageStripped));
-            } catch (IllegalStateException | IllegalArgumentException | NoSuchAlgorithmException | ClassNotFoundException | IOException e) {
-                logger.error("Unable to digest message logged", new Date(), "Unable to digest message", ExceptionUtils.getStackTrace(e));
-            }
+    /**
+     * Prints the results
+     */
+    private void printResults() {
+
+        // Write performance results
+        try {
+            printer.print(new Date(),
+                          model.getStudyUID(),
+                          model.getNumParticipants(),
+                          model.getBins().length,
+                          mailBoxCheckInterval,
+                          recording.getFastest(),
+                          recording.getSlowest(),
+                          recording.getMean(),
+                          mailboxSettings.getTracker().getNumberMessagesReceived(),
+                          mailboxSettings.getTracker().getTotalSizeMessagesReceived(),
+                          mailboxSettings.getTracker().getNumberMessagesSent(),
+                          mailboxSettings.getTracker().getTotalsizeMessagesSent());
+            
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to write performance results", e);
         }
+        
+        // Fastest finished entry => log
+        LOGGER.debug("Entry logged",
+                     new Date(),
+                     model.getStudyUID(),
+                     "finished",
+                     "first",
+                     recording.getFastest(),
+                     "duration");
+
+        // Slowest finished entry => log
+        LOGGER.debug("Slowest entry logged",
+                     new Date(),
+                     model.getStudyUID(),
+                     "finished",
+                     "last",
+                     recording.getSlowest(),
+                     "duration",
+                     recording.getMean());
     }
     
     /**
@@ -255,9 +250,8 @@ public boolean isStudyStateNone() {
      * @throws IllegalArgumentException
      * @throws BusException
      */
-    private void receiveMessages(String roundIdentifier) throws IllegalArgumentException,
-                                                         BusException {
-        getModel().getBus(this.mailBoxCheckInterval, this.isSharedMailbox).receive(new Scope(getModel().getStudyUID() + roundIdentifier),
+    private void receiveMessages(String roundIdentifier) throws IllegalArgumentException, BusException {
+        getModel().getBus(this.mailBoxCheckInterval, mailboxSettings.isSharedMailbox()).receive(new Scope(getModel().getStudyUID() + roundIdentifier),
                            new org.bihealth.mi.easybus.Participant(getModel().getParticipantFromId(getModel().getOwnId()).name,
                                                                    getModel().getParticipantFromId(getModel().getOwnId()).emailAddress),
                            this);
@@ -267,14 +261,14 @@ public boolean isStudyStateNone() {
 
             // Proceed if shares complete
             if (!getModel().isBusAlive()) {
-                logger.error("Bus is not alive anymore!", new Date(), "Bus is not alive anymore!");
+                LOGGER.error("Bus is not alive anymore!", new Date(), "Bus is not alive anymore!");
             }
             
             // Wait
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
-                logger.error("Interrupted exception logged", new Date(), "Interrupted exception logged", ExceptionUtils.getStackTrace(e));
+                LOGGER.error("Interrupted exception logged", new Date(), "Interrupted exception logged", ExceptionUtils.getStackTrace(e));
             }             
         }     
     }
@@ -294,7 +288,7 @@ public boolean isStudyStateNone() {
 
                 try {
                     // Retrieve bus and send message
-                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, this.isSharedMailbox).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
+                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, this.isSharedMailbox()).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
                                     new Scope(getModel().getStudyUID() + (getModel().getState() == StudyState.INITIAL_SENDING ? ROUND_0 : roundIdentifier)),
                                     new org.bihealth.mi.easybus.Participant(getModel().getParticipants()[index].name,
                                                                             getModel().getParticipants()[index].emailAddress));
@@ -305,42 +299,81 @@ public boolean isStudyStateNone() {
                     // Mark message as sent
                     model.markMessageSent(index);
                 } catch (Exception e) {
-                    logger.error("Unable to send e-mail logged", new Date(), "Unable to send e-mail", ExceptionUtils.getStackTrace(e));
+                    LOGGER.error("Unable to send e-mail logged", new Date(), "Unable to send e-mail", ExceptionUtils.getStackTrace(e));
                     throw new IllegalStateException("Unable to send e-mail!", e);
                 }
             }
         }
     }
-    
+
+    /**
+     * Generates a random big decimal
+     * 
+     * @param bit length of big decimal before comma
+     * @return
+     * @throws IllegalArgumentException
+     */
+    protected BigDecimal createRandomDecimal(int bitLength) throws IllegalArgumentException {
+        
+        // Check
+        if (bitLength < 2) throw new IllegalArgumentException("Bitlength must be larger than 2");
+        
+        // Random integer
+        BigDecimal value =  new BigDecimal(new BigInteger(bitLength, randomGenerator));
+        
+        // Swap sign? 
+        byte[] randomByte = new byte[1];
+        randomGenerator.nextBytes(randomByte);
+        int signum = Byte.valueOf(randomByte[0]).intValue() & 0x01;
+        if (signum == 1) value = value.negate();
+        
+        // Return
+        return value;
+      }
+ 
+    /**
+     * Proceeds the SMPC steps which are the same for participating and creating user
+     */
+    protected void performCommonSteps() {
+        
+        try {
+            // Sends the messages for the first round and proceeds the model
+            sendMessages(Resources.ROUND_1);
+            this.model.toRecievingShares();
+            LOGGER.debug("1. round sending finished logged", new Date(), getModel().getStudyUID(), "1. round sending finished for", getModel().getOwnId());
+            
+            // Receives the messages for the first round and proceeds the model
+            receiveMessages(Resources.ROUND_1);
+            this.model.toSendingResult();
+            LOGGER.debug("1. round receiving finished logged", new Date(), getModel().getStudyUID(), "1. round receiving finished for", getModel().getOwnId());
+            
+            // Sends the messages for the second round and proceeds the model
+            sendMessages(Resources.ROUND_2);
+            this.model.toRecievingResult();
+            LOGGER.debug("2. round sending finished logged", new Date(), getModel().getStudyUID(), "2. round sending finished for", getModel().getOwnId());
+            
+            // Receives the messages for the second round, stops the bus and finalizes the model
+            receiveMessages(Resources.ROUND_2);
+            getModel().stopBus();
+            recording.addFinishedTime(this.model.getOwnId(), System.nanoTime());
+            if (recording.isDone()) {
+                printResults();
+            }
+            this.model.toFinished();
+            LOGGER.debug("Result logged", new Date(), getModel().getStudyUID(), "result", getModel().getOwnId(), "participantid", getModel().getAllResults()[0].name, "result name", getModel().getAllResults()[0].value, "result");
+            
+        } catch (IllegalStateException | IllegalArgumentException | IOException | BusException e) {
+            LOGGER.error("Unable to process common process steps logged", new Date(), "Unable to process common process steps", ExceptionUtils.getStackTrace(e));
+            throw new IllegalStateException("Unable to process common process steps", e);
+        }
+    }
+
     /**
      * Sets the model
      * 
      * @param the model
      */
-    public void setModel(Study model) {
+    protected void setModel(Study model) {
         this.model = model;
-    }
-
-    /**
-     * Returns the recording
-     * 
-     * @return
-     */
-    public RecordTimeDifferences getRecording() {
-        return recording;
-    }
-    
-    /**
-     * Sets the recording
-     * 
-     * @param the recording
-     */
-    public void setRecording(RecordTimeDifferences recording) {
-        this.recording = recording;
-    }
-    
-    @Override
-    public void receiveError(Exception e) {
-        logger.error("Error receiveing e-mails logged", new Date(), "Error receiveing e-mails" ,ExceptionUtils.getStackTrace(e));
     }
 }

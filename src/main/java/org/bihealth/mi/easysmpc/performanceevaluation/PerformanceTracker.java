@@ -22,7 +22,6 @@ import org.bihealth.mi.easybus.PerformanceListener;
  * 
  * @author Fabian Prasser
  * @author Felix Wirth
- *
  */
 public class PerformanceTracker implements PerformanceListener {
 

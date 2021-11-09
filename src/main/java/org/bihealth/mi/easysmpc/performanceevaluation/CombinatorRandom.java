@@ -17,16 +17,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
-
 /**
  * Allows to obtain a random combination of parameters
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
-public class RandomCombinator extends Combinator implements Iterator<Combination> {
-    
+public class CombinatorRandom extends Combinator {
+
     /** Random */
     private Random random;
 
@@ -35,25 +33,25 @@ public class RandomCombinator extends Combinator implements Iterator<Combination
      * @param bins
      * @param mailboxCheckInterval
      */
-    public RandomCombinator(List<Integer> participants,
+    public CombinatorRandom(List<Integer> participants,
                             List<Integer> bins,
                             List<Integer> mailboxCheckInterval) {
         // Call super
         super(participants, bins, mailboxCheckInterval);
-        
+
         // Create random
         this.random = new Random();
-    }    
-
-    @Override
-    public Iterator<Combination> iterator() {
-        return this;
     }
 
     @Override
     public boolean hasNext() {
         // This combinator has always a next element
         return true;
+    }
+
+    @Override
+    public Iterator<Combination> iterator() {
+        return this;
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.util.List;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bihealth.mi.easysmpc.performanceevaluation.ParticipatingUser.ParticipatingUserData;
 import org.bihealth.mi.easysmpc.resources.Resources;
 
 import de.tu_darmstadt.cbs.emailsmpc.Bin;
@@ -31,54 +30,58 @@ import de.tu_darmstadt.cbs.emailsmpc.Participant;
  * A creating user in an EasySMPC process
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
-public class CreatingUser extends User {
-    
-    /** All participating users */
-    private final List<User> participatingUsers = new ArrayList<>(); 
+public class UserCreating extends User {
+
     /** Logger */
-    Logger logger = LogManager.getLogger(CreatingUser.class);
-    
+    private static final Logger LOGGER             = LogManager.getLogger(UserCreating.class);
+ 
+    /** Participating users */
+    private List<User>          participatingUsers = new ArrayList<>();
+
     /**
      * Create a new instance
      * 
      * @param numberParticipants
      * @param numberBins
-     * @param mailBoxDetails
+     * @param mailboxSettings
      * @param separatedProcesses 
      * @throws IllegalStateException
      */
-    CreatingUser(int numberParticipants,
-                 int numberBins,
-                 int mailBoxCheckInterval,
-                 MailboxDetails mailBoxDetails,
-                 ResultPrinter printer) throws IllegalStateException {
-        super(mailBoxCheckInterval, mailBoxDetails.isSharedMailbox());
+    public UserCreating(int numberParticipants,
+                        int numberBins,
+                        int mailboxCheckInterval,
+                        PerformanceMailboxSettings mailboxSettings,
+                        PerformanceResultPrinter printer) throws IllegalStateException {
+        
+        super(mailboxCheckInterval, mailboxSettings, printer);
 
         try {          
             // Set model to starting
             getModel().toStarting();          
             
             // Init model with generated study name, participants and bins 
-            getModel().toInitialSending(generateRandomString(FIXED_LENGTH_STRING),
-                                        generateParticpants(numberParticipants, mailBoxDetails, FIXED_LENGTH_STRING),
-                                        generateBins(numberBins,numberParticipants, FIXED_LENGTH_STRING, FIXED_LENGTH_BIT_NUMBER), mailBoxDetails.getConnection(0));
-            // Init recoding
-            setRecording(new RecordTimeDifferences(getModel(), mailBoxCheckInterval, System.nanoTime(), mailBoxDetails.getTracker(), printer));
+            getModel().toInitialSending(createRandomString(FIXED_LENGTH_STRING),
+                                        createParticpants(numberParticipants, mailboxSettings, FIXED_LENGTH_STRING),
+                                        createBins(numberBins,numberParticipants, FIXED_LENGTH_STRING), mailboxSettings.getConnection(0));
+            // Init recording
+            getRecorder().addStartTime(getModel().getOwnId(), System.nanoTime());
+            LOGGER.debug("Started", new Date(), getModel().getStudyUID(), "started", getModel().getNumParticipants(), "participants", getModel().getBins().length, "bins", mailboxCheckInterval, "mailbox check interval");
+            
         } catch (IOException | IllegalStateException e) {
-            logger.error("Unable to init logged", new Date(), "Unable to init", ExceptionUtils.getStackTrace(e));
+            LOGGER.error("Unable to init logged", new Date(), "Unable to init", ExceptionUtils.getStackTrace(e));
             throw new IllegalStateException("Unable to init study!", e);
         }
         
         // Spawn participants
-        createParticipants(FIXED_LENGTH_BIT_NUMBER, mailBoxDetails);
+        participatingUsers = createParticipatingUsers(FIXED_LENGTH_BIT_NUMBER, mailboxSettings);
         
         // Spawns the common steps in an own thread
         new Thread(new Runnable() {
             @Override
             public void run() {
-                proceedCommonProcessSteps();
+                performCommonSteps();
             }
         }).start();             
     }
@@ -107,55 +110,48 @@ public class CreatingUser extends User {
     }
 
     /**
+     * Generate bins
+     * 
+     * @param numberBins number of bins
+     * @param numberParties number of involved parties/users
+     * @param stringLength length of bin name
+     * @return
+     */
+    private Bin[] createBins(int numberBins, int numberParties, int stringLength) {
+
+        // Init result bin array
+        Bin[] result = new Bin[numberBins];
+        
+        // Init each bin and set generated secret value of creating user
+        for (int index = 0; index < numberBins; index++) {
+            result[index] = new Bin(createRandomString(stringLength), numberParties);
+            result[index].shareValue(createRandomDecimal(FIXED_LENGTH_BIT_NUMBER), Resources.FRACTIONAL_BITS);
+        }
+        
+        // Return
+        return result;
+    }
+
+
+    /**
      * Create participants
      * 
      * @param bitLengthNumber
      * @param separatedProcesses
      * @param connectionIMAPSettings 
      */
-    private void createParticipants(int bitLengthNumber,
-                                    MailboxDetails mailBoxDetails) {
-        // Loop over participants
+    private List<User> createParticipatingUsers(int bitLengthNumber,
+                                                PerformanceMailboxSettings mailBoxDetails) {
+
+        // Result
+        List<User> result = new ArrayList<>();
+        
+        // Create
         for(int index = 1; index < getModel().getNumParticipants(); index++) {
-            // Create data
-            ParticipatingUserData userData =  new ParticipatingUserData(getModel().getStudyUID(),
-                                  getModel().getParticipants()[index],
-                                  index,
-                                  mailBoxDetails.getConnection(index),
-                                  bitLengthNumber,
-                                  getMailboxCheckInterval(),
-                                  mailBoxDetails.isSharedMailbox(),
-                                  getRecording());
-            
-            // Create user as new thread
-            participatingUsers.add(new ParticipatingUser(userData));
-        }
-    }
-
-
-    /**
-     * Generate bins
-     * 
-     * @param numberBins number of bins
-     * @param numberParties number of involved parties/users
-     * @param stringLength length of bin name
-     * @param bitLengthNumber length of generated big integer
-     * @return
-     */
-    protected Bin[] generateBins(int numberBins,
-                                 int numberParties,
-                                 int stringLength,
-                                 int bitLengthNumber) {
-        // Init result bin array
-        Bin[] result = new Bin[numberBins];
-        
-        // Init each bin and set generated secret value of creating user
-        for (int index = 0; index < numberBins; index++) {
-            result[index] = new Bin(generateRandomString(stringLength), numberParties);
-            result[index].shareValue(generateRandomBigDecimal(bitLengthNumber), Resources.FRACTIONAL_BITS);
+            result.add(new UserParticipating(this, index));
         }
         
-        // Return
+        // Done
         return result;
     }
     
@@ -167,7 +163,8 @@ public class CreatingUser extends User {
      * @param stringLength length of names and e-mail address parts
      * @return
      */
-    private Participant[] generateParticpants(int numberParticipants, MailboxDetails mailBoxDetails, int stringLength) {
+    private Participant[] createParticpants(int numberParticipants, PerformanceMailboxSettings mailBoxDetails, int stringLength) {
+
         // Init result
         Participant[] result = new Participant[numberParticipants];
         
@@ -176,15 +173,28 @@ public class CreatingUser extends User {
             
             // Generate either am email address or use an actual address 
             String emailAddress = isSharedMailbox()
-                    ? generateRandomString(15) + "@" + generateRandomString(10) + ".org"
+                    ? createRandomString(15) + "@" + createRandomString(10) + ".org"
                     : mailBoxDetails.getConnection(index).getEmailAddress();
             
             // Create participant   
-            result[index] = new Participant(generateRandomString(15), emailAddress);
+            result[index] = new Participant(createRandomString(15), emailAddress);
         }
         
         // Return
         return result;
     }
     
+    /**
+     * Generates a string with random letters
+     * 
+     * @param string length
+     * @return generated string
+     */
+    protected String createRandomString(int stringLength) {   
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < stringLength; i++) {
+            b.append((char) (Math.random() * 26 + 'a'));
+        }
+        return b.toString();
+    }
 }

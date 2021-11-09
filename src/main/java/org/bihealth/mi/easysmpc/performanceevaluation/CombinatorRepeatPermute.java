@@ -16,15 +16,13 @@ package org.bihealth.mi.easysmpc.performanceevaluation;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
-
 /**
  * A class to permute the parameters and repeat them
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
-public class RepeatPermuteCombinator extends Combinator implements Iterator<Combination> {
+public class CombinatorRepeatPermute extends Combinator {
 
     /** How often repeat each step? */
     private final int repeatPerCombination;
@@ -44,7 +42,7 @@ public class RepeatPermuteCombinator extends Combinator implements Iterator<Comb
      * @param bins
      * @param mailboxCheckInterval
      */
-    public RepeatPermuteCombinator(List<Integer> participants,
+    public CombinatorRepeatPermute(List<Integer> participants,
                                    List<Integer> bins,
                                    List<Integer> mailboxCheckInterval,
                                    int repeatPerStep) {
@@ -54,22 +52,40 @@ public class RepeatPermuteCombinator extends Combinator implements Iterator<Comb
         this.repeatPerCombination = repeatPerStep;
     }
 
+    @Override
+    public boolean hasNext() {
+        return next(true);
+    }
+
+    @Override
+    public Iterator<Combination> iterator() {
+        return this;
+    }
+
+    @Override
+    public Combination next() {
+        if (!next(false)) { return null; }
+
+        // Return
+        return new Combination(getParticipants().get(particpantIndex),
+                               getBins().get(binIndex),
+                               getMailboxCheckInterval().get(mailboxCheckIntervalIndex));
+    }
 
     /**
      * Increases the counter and indexes
      * 
-     * @param dryRun If actually increase numbers, if false just check if possible 
-     * @return Is an increase still possible?
+     * @param dryRun If actually increase numbers, if false just check if possible
+     * @return Is there a next element?
      */
-    private boolean increase(boolean dryRun) {
+    private boolean next(boolean dryRun) {
 
         // Copy fields as local variables
         int mailboxCheckIntervalIndex = this.mailboxCheckIntervalIndex;
         int binIndex = this.binIndex;
         int particpantIndex = this.particpantIndex;
         int counterRepetition = this.counterRepetition;
-        
-        
+
         // Advance indexes if necessary
         if (this.counterRepetition >= this.repeatPerCombination) {
 
@@ -106,12 +122,12 @@ public class RepeatPermuteCombinator extends Combinator implements Iterator<Comb
                 }
             }
         }
-        
+
         // Increase counter
         ++counterRepetition;
-        
+
         // If actual run store variables
-        if(!dryRun) {
+        if (!dryRun) {
             // Store counter
             this.counterRepetition = counterRepetition;
             // Store indexes
@@ -119,29 +135,7 @@ public class RepeatPermuteCombinator extends Combinator implements Iterator<Comb
             this.binIndex = binIndex;
             this.particpantIndex = particpantIndex;
         }
-        
+
         return true;
-    }
-
-    @Override
-    public Iterator<Combination> iterator() {
-        return this;
-    }
-    
-    @Override
-    public boolean hasNext() {
-        return increase(true);
-    }
-
-    @Override
-    public Combination next() {
-        if(!increase(false)) {
-            return null;
-        }
-        
-        // Return
-        return new Combination(getParticipants().get(particpantIndex),
-                               getBins().get(binIndex),
-                               getMailboxCheckInterval().get(mailboxCheckIntervalIndex));
     };
 }

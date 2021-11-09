@@ -13,6 +13,7 @@
  */
 package org.bihealth.mi.easysmpc.performanceevaluation;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
@@ -21,16 +22,17 @@ import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
  * A class to combine the different parameters for the performance evaluation
  * 
  * @author Felix Wirth
- *
+ * @author Fabian Prasser
  */
-public abstract class Combinator implements Iterable<Combination>{
-    
+public abstract class Combinator implements Iterable<Combination>, Iterator<Combination> {
+
     /**
-     * A combination of possible parameters 
+     * A combination of possible parameters
+     * 
      * @author Felix Wirth
-     *
      */
     public class Combination {
+
         /** Participant */
         private final int participants;
         /** Bins */
@@ -45,9 +47,7 @@ public abstract class Combinator implements Iterable<Combination>{
          * @param bins
          * @param mailboxCheckInterval
          */
-        public Combination(int participants,
-                           int bins,
-                           int mailboxCheckInterval) {
+        public Combination(int participants, int bins, int mailboxCheckInterval) {
             this.participants = participants;
             this.bins = bins;
             this.mailboxCheckInterval = mailboxCheckInterval;
@@ -74,35 +74,35 @@ public abstract class Combinator implements Iterable<Combination>{
             return participants;
         }
     }
-    
+
     /** Possible participants */
     private final List<Integer> participants;
     /** Possible bins */
     private final List<Integer> bins;
     /** Possible mailboxCheckInterval */
     private final List<Integer> mailboxCheckInterval;
-    
+
     /**
      * @param participants
      * @param bins
      * @param mailboxCheckInterval
      */
     public Combinator(List<Integer> participants,
-                            List<Integer> bins,
-                            List<Integer> mailboxCheckInterval) {
+                      List<Integer> bins,
+                      List<Integer> mailboxCheckInterval) {
         // Store
         this.participants = participants;
         this.bins = bins;
         this.mailboxCheckInterval = mailboxCheckInterval;
     }
-    
+
     /**
      * @return the bins
      */
     protected List<Integer> getBins() {
         return bins;
     }
-    
+
     /**
      * @return the mailboxCheckInterval
      */

@@ -55,9 +55,6 @@ public class Main {
         System.out.println("For results see /root/easy-smpc/"+ FILEPATH);
         
         PerformanceResultPrinter printer = new PerformanceResultPrinter(FILEPATH);
-
-        // Shared mailbox
-        boolean isSharedMailbox = false;
         
         // Repetitions
         int repetitionsPerCombination = 15;
@@ -80,7 +77,7 @@ public class Main {
 		Combinator combinator = new CombinatorRepeatPermute(participants, bins, mailboxCheckInterval, repetitionsPerCombination);
 
 		// Create mailbox details
-		PerformanceMailboxSettings mailboxSettings = new PerformanceMailboxSettings(isSharedMailbox, connectionIMAPSettings, participants, tracker);
+		PerformanceMailboxSettings mailboxSettings = new PerformanceMailboxSettings(connectionIMAPSettings, participants, tracker);
 
         // Prepare mailbox
         try {

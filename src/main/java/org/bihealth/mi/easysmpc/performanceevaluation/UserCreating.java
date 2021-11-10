@@ -169,15 +169,10 @@ public class UserCreating extends User {
         Participant[] result = new Participant[numberParticipants];
         
         // Init each participant with a generated name and generated mail address
-        for(int index = 0; index < numberParticipants; index++) {
-            
-            // Generate either am email address or use an actual address 
-            String emailAddress = isSharedMailbox()
-                    ? createRandomString(15) + "@" + createRandomString(10) + ".org"
-                    : mailBoxDetails.getConnection(index).getEmailAddress();
+        for(int index = 0; index < numberParticipants; index++) {            
             
             // Create participant   
-            result[index] = new Participant(createRandomString(15), emailAddress);
+            result[index] = new Participant(createRandomString(15), mailBoxDetails.getConnection(index).getEmailAddress());
         }
         
         // Return

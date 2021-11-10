@@ -138,13 +138,6 @@ public abstract class User implements MessageListener {
     public boolean isProcessFinished() {
         return getModel().getState() == StudyState.FINISHED;
     }
-
-    /**
-     * @return is a shared mailbox used?
-     */
-    public boolean isSharedMailbox() {
-        return mailboxSettings.isSharedMailbox();
-    }
     
     @Override
     public void receive(org.bihealth.mi.easybus.Message message) {
@@ -251,7 +244,7 @@ public abstract class User implements MessageListener {
      * @throws BusException
      */
     private void receiveMessages(String roundIdentifier) throws IllegalArgumentException, BusException {
-        getModel().getBus(this.mailBoxCheckInterval, mailboxSettings.isSharedMailbox()).receive(new Scope(getModel().getStudyUID() + roundIdentifier),
+        getModel().getBus(this.mailBoxCheckInterval, false).receive(new Scope(getModel().getStudyUID() + roundIdentifier),
                            new org.bihealth.mi.easybus.Participant(getModel().getParticipantFromId(getModel().getOwnId()).name,
                                                                    getModel().getParticipantFromId(getModel().getOwnId()).emailAddress),
                            this);
@@ -288,7 +281,7 @@ public abstract class User implements MessageListener {
 
                 try {
                     // Retrieve bus and send message
-                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, this.isSharedMailbox()).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
+                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, false).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
                                     new Scope(getModel().getStudyUID() + (getModel().getState() == StudyState.INITIAL_SENDING ? ROUND_0 : roundIdentifier)),
                                     new org.bihealth.mi.easybus.Participant(getModel().getParticipants()[index].name,
                                                                             getModel().getParticipants()[index].emailAddress));

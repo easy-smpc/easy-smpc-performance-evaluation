@@ -31,9 +31,6 @@ public class PerformanceMailboxSettings {
 
     /** Replace this by index */
     public static final String           INDEX_REPLACE = "REPLACE";
-    
-    /** Use several or exactly one mail box for the bus */
-    private boolean                      isSharedMailbox;
     /** Template to create ConnectionIMAPSettings */
     private final ConnectionIMAPSettings connectionIMAPTemplate;
     /** Max participants */
@@ -44,20 +41,13 @@ public class PerformanceMailboxSettings {
     /**
      * Creates a new instance
      * 
-     * @param isSharedMailbox
      * @param connectionIMAPTemplate
      * @param participants
      * @param tracker
      */
-    public PerformanceMailboxSettings(boolean isSharedMailbox, ConnectionIMAPSettings connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {
+    public PerformanceMailboxSettings(ConnectionIMAPSettings connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {              
         
-        // Check index replace index is provided        
-        if(!isSharedMailbox && !connectionIMAPTemplate.getEmailAddress().contains(INDEX_REPLACE )) {
-            throw new IllegalStateException(String.format("A non-shared mailbox must contain the indication %s", INDEX_REPLACE));
-        }
-        
-        // Store
-        this.isSharedMailbox = isSharedMailbox;        
+        // Store       
         this.connectionIMAPTemplate = connectionIMAPTemplate;
         this.maxParticipants = Collections.max(participants);
         this.tracker = tracker;
@@ -89,17 +79,6 @@ public class PerformanceMailboxSettings {
      * @return
      */
     public ConnectionIMAPSettings getConnection(int index) {
-        // Return same connection for all indexes if shared mailbox
-        if(isSharedMailbox) {
-            return new ConnectionIMAPSettings(connectionIMAPTemplate.getEmailAddress()).setPassword(connectionIMAPTemplate.getPassword())
-                                                                                       .setIMAPPort(connectionIMAPTemplate.getIMAPPort())
-                                                                                       .setIMAPServer(connectionIMAPTemplate.getIMAPServer())
-                                                                                       .setSMTPServer(connectionIMAPTemplate.getSMTPServer())
-                                                                                       .setSMTPPort(connectionIMAPTemplate.getSMTPPort())
-                                                                                       .setAcceptSelfSignedCertificates(true)
-                                                                                       .setSearchForProxy(false)
-                                                                                       .setPerformanceListener(tracker);
-        }
         
         // Replace        
         String newEmail = connectionIMAPTemplate.getEmailAddress().replaceFirst(INDEX_REPLACE, String.valueOf(index));
@@ -121,14 +100,5 @@ public class PerformanceMailboxSettings {
      */
     public PerformanceTracker getTracker() {
     	return this.tracker;
-    }
-    
-    /**
-     * Is shared mailbox used?
-     * 
-     * @return
-     */
-    public boolean isSharedMailbox() {
-        return this.isSharedMailbox;
     }
 }

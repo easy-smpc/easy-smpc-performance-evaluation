@@ -1,6 +1,5 @@
 FROM iredmail/mariadb:stable
 # Create volumes
-#VOLUME /root/easy-smpc
 # Set environment var
 ENV HOSTNAME=mail.easysmpc.org
 ENV FIRST_MAIL_DOMAIN=easysmpc.org

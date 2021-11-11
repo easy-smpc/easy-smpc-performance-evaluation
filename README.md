@@ -11,7 +11,7 @@
 1. The performance evaluation is running and can be inspected with the command `docker logs easy-eval`. The results can be accessed in the file */root/easy-smpc/result.csv* within the container e.g. by copying the file to the host with the command `docker cp easy-eval:/root/easy-smpc/performanceEvaluation.csv .`
 
 ## Contact
-See [README page](https://github.com/prasser/easy-smpc/edit/master/README.md) of EasySMPC
+See github [README page](https://github.com/prasser/easy-smpc/edit/master/README.md) of EasySMPC
 
 ## License
 This software is licensed under the Apache License 2.0. The full text is accessible in the LICENSE file. EasySMPC itself has several dependencies whose license files are listed in the github [README page](https://github.com/prasser/easy-smpc/edit/master/README.md).

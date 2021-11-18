@@ -1,7 +1,7 @@
 /data/
 /target/
 *.log
-*.csv
+result.csv
 /bin/
 /.classpath
 /.project

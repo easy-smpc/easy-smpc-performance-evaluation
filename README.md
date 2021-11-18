@@ -1,6 +1,7 @@
 # Performance evaluation of the software EasySMPC
 
 > This repository allows to reproduce the performance evaluation of the software [EasySMPC](https://github.com/prasser/easy-smpc) in a dockerized form with the e-mail server  [iRedMail](https://www.iredmail.org/). The steps are described below.
+> The result of a run of the evaluation are stored in the folder `results`
 ---
 
 ## Steps to reproduce the performance evaluation

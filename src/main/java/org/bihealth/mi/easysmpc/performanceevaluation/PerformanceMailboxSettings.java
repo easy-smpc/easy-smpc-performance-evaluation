@@ -84,7 +84,7 @@ public class PerformanceMailboxSettings {
         String newEmail = connectionIMAPTemplate.getEmailAddress().replaceFirst(INDEX_REPLACE, String.valueOf(index));
         
         // Return object with new mail address
-        return new ConnectionIMAPSettings(newEmail).setPassword(connectionIMAPTemplate.getPassword())
+        return new ConnectionIMAPSettings(newEmail, null).setPassword(connectionIMAPTemplate.getPassword(false))
                                                    .setIMAPPort(connectionIMAPTemplate.getIMAPPort())
                                                    .setIMAPServer(connectionIMAPTemplate.getIMAPServer())
                                                    .setSMTPServer(connectionIMAPTemplate.getSMTPServer())

@@ -13,9 +13,9 @@
 
 ## Troubleshooting
 ### Latency created with *tc*
-The latency within the docker container is creates with the program *tc*. On startup this program may fail to start.If this is the case the docker logs show the error message ` Specified qdisc not found`. Solving this issue is dependeant of your host OS:
+The latency within the docker container is creates with the program *tc*. On startup this program may fail to start. If this is the case, the docker logs show the error message ` Specified qdisc not found`. Solving this issue is dependent of your host OS:
 * **Linux**: Please make sure the kernel module *sch_netem* is loaded, e.g. by installing the package *kernel-modules-extra* provided by different Linux distributions.
-* **Windows**: Pleae deactivate the use of WSL 2 engine as described [here](https://stackoverflow.com/questions/68176812/docker-traffic-control-tc-specified-qdisc-not-found).
+* **Windows**: Please deactivate the use of WSL 2 engine as described [here](https://stackoverflow.com/questions/68176812/docker-traffic-control-tc-specified-qdisc-not-found).
 
 ## Contact
 See github [README page](https://github.com/prasser/easy-smpc/edit/master/README.md) of EasySMPC

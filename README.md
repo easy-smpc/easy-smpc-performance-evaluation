@@ -17,7 +17,7 @@ The latency within the docker container is creates with the program *tc*. On sta
 * **Linux**: Please make sure the kernel module *sch_netem* is loaded, e.g. by installing the package *kernel-modules-extra* provided by different Linux distributions.
 * **Windows**: Please deactivate the use of WSL 2 engine as described [here](https://stackoverflow.com/questions/68176812/docker-traffic-control-tc-specified-qdisc-not-found).
 
-### Needed Resources
+### Required resources
 10 gigabyte of RAM for the docker container are recommended.
 
 ## Contact

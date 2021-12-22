@@ -1,6 +1,5 @@
 package org.bihealth.mi.easysmpc.performanceevaluation;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,8 +42,7 @@ public class PerformanceResultPrinter {
                                                                  "Number messages received",
                                                                  "Total size messages received",
                                                                  "Number messages sent",
-                                                                 "Total size messages sent")
-                                                     .withSkipHeaderRecord(new File(file).exists()));
+                                                                 "Total size messages sent"));
     }
 
     public synchronized void close() throws IOException {

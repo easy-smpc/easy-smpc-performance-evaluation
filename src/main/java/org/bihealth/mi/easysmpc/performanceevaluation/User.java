@@ -287,7 +287,7 @@ public abstract class User implements MessageListener {
                                                                             getModel().getParticipants()[index].emailAddress));
                     
                     // Wait for result with a timeout time
-                    future.get(Resources.TIMEOUT_SEND_EMAILS, TimeUnit.MILLISECONDS);
+                    future.get(Resources.TIMEOUT_SEND_EMAILS_DEFAULT, TimeUnit.MILLISECONDS);
                     
                     // Mark message as sent
                     model.markMessageSent(index);

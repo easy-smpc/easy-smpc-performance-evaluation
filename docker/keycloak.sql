@@ -2,6 +2,13 @@
 CREATE DATABASE keycloak;
 \c keycloak;
 
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.1
+-- Dumped by pg_dump version 14.1
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -2198,6 +2205,7 @@ bff9593b-fff8-4652-98ed-81f598f50b10	\N	password	87004960-05fe-4678-8947-d4cfe4f
 c9f1883f-8f69-4edb-b337-df4937fd29b5	\N	password	43c47199-13bf-44d2-9beb-05082ec52399	1669057917349	My password	{"value":"V2jQeYJbdBWcuuh7oeu5Z0YrNkL/sMANHluyQ4J/BfmNDss7vzpbEwMW2jiKX3f18Bn4HWsLsFXoDhO1p2AAZg==","salt":"eQOTHmtfKZ/2oW+7z+fVIg==","additionalParameters":{}}	{"hashIterations":27500,"algorithm":"pbkdf2-sha256","additionalParameters":{}}	10
 b4c1520c-3234-4387-b3fc-329d90b836b0	\N	password	93e954f0-9ee0-499f-b46c-e58868390e3d	1669057952760	My password	{"value":"q+65sSmTV7gIDthgI+UUSlQH4HudMEfOFYmRhZ5NMtHLwxywM4z86cTZeXw8MouotPHm0QQTZeJbb6i6Wq0PLA==","salt":"Dn4x0aERP9ixSPRPPRKOTg==","additionalParameters":{}}	{"hashIterations":27500,"algorithm":"pbkdf2-sha256","additionalParameters":{}}	10
 3e743ac5-df90-4a42-9b6b-01a06eced4d6	\N	password	c2c25e9e-bb77-4adf-b1fc-17c1bd805aa4	1669057981338	My password	{"value":"3XTqNRIwZo2RxWewCiB6FeGZZHq7b7UiPSistkVXVxEpR26lThMPVI0W4Uqd0BYXz2fmKWGRX7JJkM6ZdHwP7g==","salt":"wG8TnmGxANIOTaSJQyoCEQ==","additionalParameters":{}}	{"hashIterations":27500,"algorithm":"pbkdf2-sha256","additionalParameters":{}}	10
+b3d5daf7-bf5d-4031-b5c6-671d1cc1138c	\N	password	3e72a48d-a17d-4bff-a63b-2f34d5b3e296	1669073312307	My password	{"value":"QCsoGysqxki1PYTfzxhY+zlrSpvrJJPYcB6pcjnvhc5STkytMRZFLGrjfwNixXH5BLGE3IuEgjk5kQS0McBYEQ==","salt":"7UOo8dFW6RMXw5eGmkeAAA==","additionalParameters":{}}	{"hashIterations":27500,"algorithm":"pbkdf2-sha256","additionalParameters":{}}	10
 \.
 
 
@@ -5482,3 +5490,4 @@ ALTER TABLE ONLY public.identity_provider_config
 --
 -- PostgreSQL database dump complete
 --
+

@@ -1,0 +1,47 @@
+spring:
+  jpa:
+    open-in-view: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  main:
+    allow-circular-references: true
+
+app:
+  response:
+    # possible entries: application/json or text/plain
+    preferred-media-type: application/json
+  datasource:
+    easybackend:
+      url: jdbc:postgresql://eb-postgresql:5432/easybackend
+      username: postgres
+      password: admin
+      configuration:
+        maximum-pool-size: 20
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      
+ 
+keycloak:
+  realm: easybackend 
+  auth-server-url: http://eb-keycloak:8080/auth
+  resource: easy-client
+  enable-basic-auth: false # disable only except token not a username_password in header
+#  credentials:
+#    secret: Enter if needed
+  ssl-required: external
+  use-resource-role-mappings: false
+  token-minimum-time-to-live: 30
+  confidential-port: 0
+  bearer-only: true # needed to disable redirect for a login
+  principal-attribute: preferred_username

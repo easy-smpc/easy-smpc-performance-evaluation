@@ -14,6 +14,7 @@
 package org.bihealth.mi.easysmpc.performanceevaluation;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,10 +23,13 @@ import java.util.List;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bihealth.mi.easybus.Bus;
 import org.bihealth.mi.easybus.BusException;
-import org.bihealth.mi.easybus.implementations.email.BusEmail;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAP;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
+import org.bihealth.mi.easybus.MessageFilter;
+import org.bihealth.mi.easybus.Participant;
+import org.bihealth.mi.easybus.PasswordStore;
+import org.bihealth.mi.easybus.implementations.http.easybackend.BusEasyBackend;
+import org.bihealth.mi.easybus.implementations.http.easybackend.ConnectionSettingsEasyBackend;
 import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
 
 /**
@@ -42,13 +46,17 @@ public class Main {
 	/** Logger */
 	private static final Logger LOGGER = LogManager.getLogger(Main.class);
 	
+	/**  Default message size */
+    public static final int DEFAULT_MESSAGE_SIZE = 1024 * 1024;
+	
 	/**
 	 * Starts the performance test
 	 *
 	 * @param args
 	 * @throws IOException 
+	 * @throws BusException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, BusException {
 	    
 	    // Output start message
         System.out.println("Performance evaluation started");
@@ -61,33 +69,41 @@ public class Main {
         
 		// Performance tracking
 		PerformanceTracker tracker = new PerformanceTracker();
-
+		
+		
         // Create connection settings
-        ConnectionIMAPSettings connectionIMAPSettings = new ConnectionIMAPSettings(
-                "easy" + PerformanceMailboxSettings.INDEX_REPLACE + "@easysmpc.org", null).setPassword("12345").setSMTPServer("localhost")
-                        .setIMAPServer("localhost").setIMAPPort(993).setSMTPPort(465)
-                        .setAcceptSelfSignedCertificates(true).setSearchForProxy(false).setPerformanceListener(tracker);
+        ConnectionSettingsEasyBackend connectionSettingsTemplate = new ConnectionSettingsEasyBackend(new Participant("easy" + SettingsGenerator.INDEX_REPLACE,
+                                                                                                             "easy" + SettingsGenerator.INDEX_REPLACE + "@easysmpc.org"),
+                                                                                             null)
+                .setAPIServer(new URL("http://eb-service:8080"))
+                .setAuthServer(new URL("http://eb-keycloak:8080"))
+                .setMaxMessageSize(DEFAULT_MESSAGE_SIZE);
+        connectionSettingsTemplate.setPasswordStore(new PasswordStore("12345"));
 
 		// Create parameters
-		List<Integer> participants = new ArrayList<>(Arrays.asList(new Integer[] { 20, 15, 10, 5, 3 }));
-		List<Integer> bins = new ArrayList<>(Arrays.asList(new Integer[] { 10000, 7500, 5000, 2500, 1000 }));
-		List<Integer> mailboxCheckInterval = new ArrayList<>(Arrays.asList(new Integer[] { 20000, 15000, 10000, 5000, 1000 }));
+        List<Integer> participants = new ArrayList<>(Arrays.asList(new Integer[] { 20, 15, 10, 5, 3 }));
+        List<Integer> bins = new ArrayList<>(Arrays.asList(new Integer[] { 10000, 7500, 5000, 2500, 1000 }));
+        List<Integer> mailboxCheckInterval = new ArrayList<>(Arrays.asList(new Integer[] { 20000, 15000, 10000, 5000, 1000 }));
 		
 		// Create combinator
 		Combinator combinator = new CombinatorRepeatPermute(participants, bins, mailboxCheckInterval, repetitionsPerCombination);
 
 		// Create mailbox details
-		PerformanceMailboxSettings mailboxSettings = new PerformanceMailboxSettings(connectionIMAPSettings, participants, tracker);
+		SettingsGenerator settingsGenerator = new SettingsGenerator(connectionSettingsTemplate, participants, tracker);
 
         // Prepare mailbox
         try {
 
             // Delete existing e-mails relevant to EasySMPC
-            for (ConnectionIMAPSettings imapConnectionSettings : mailboxSettings.getAllConnections()) {
-                BusEmail bus = new BusEmail(new ConnectionIMAP(imapConnectionSettings, false), 1000);
-                bus.purgeEmails();
-                bus.stop();
-            }
+            Bus bus = new BusEasyBackend(1, 1000, settingsGenerator.getConnection(0), Main.DEFAULT_MESSAGE_SIZE);
+            bus.purge(new MessageFilter() {
+
+                @Override
+                public boolean accepts(String messageDescription) {
+                    return true;
+                }
+            });
+            bus.stop();
 
         } catch (BusException | InterruptedException e) {
             LOGGER.error("Preparation failed logged", new Date(), "Preparation failed", ExceptionUtils.getStackTrace(e));
@@ -101,7 +117,7 @@ public class Main {
             UserCreating user = new UserCreating(combination.getParticipants(), 
                                                  combination.getBins(), 
                                                  combination.getMailboxCheckInterval(), 
-                                                 mailboxSettings,
+                                                 settingsGenerator,
                                                  printer);
 
             // Wait to finish
@@ -115,7 +131,7 @@ public class Main {
             }
 
             // Reset statistics
-            mailboxSettings.getTracker().resetStatistics();
+            settingsGenerator.getTracker().resetStatistics();
 
             // Wait
             LOGGER.debug("Process finished logged", new Date(), "Process finished!");

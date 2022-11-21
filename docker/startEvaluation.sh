@@ -1,3 +1,4 @@
+REMOVE?
 #!/bin/bash 
 sudo docker run \
 	--rm \

@@ -20,12 +20,12 @@ import java.util.Date;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bihealth.mi.easybus.Bus;
 import org.bihealth.mi.easybus.BusException;
 import org.bihealth.mi.easybus.MessageListener;
 import org.bihealth.mi.easybus.Scope;
-import org.bihealth.mi.easybus.implementations.email.BusEmail;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAP;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
+import org.bihealth.mi.easybus.implementations.http.easybackend.BusEasyBackend;
+import org.bihealth.mi.easybus.implementations.http.easybackend.ConnectionSettingsEasyBackend;
 
 import de.tu_darmstadt.cbs.emailsmpc.Message;
 import de.tu_darmstadt.cbs.emailsmpc.MessageInitial;
@@ -43,7 +43,7 @@ public class UserParticipating extends User {
     private static final Logger    LOGGER = LogManager.getLogger(UserParticipating.class);
 
     /** Connection settings */
-    private ConnectionIMAPSettings connectionSettings;
+    private ConnectionSettingsEasyBackend connectionSettings;
 
     /**
      * Creates a new instance
@@ -51,7 +51,7 @@ public class UserParticipating extends User {
      * @param initiator
      * @param participantID 
      */
-    public UserParticipating(UserCreating initiator, int participantID) {                
+    public UserParticipating(UserCreating initiator, int participantID) {
    
         // Store
         super(initiator);
@@ -64,16 +64,15 @@ public class UserParticipating extends User {
         getRecorder().addStartTime(participantID, System.nanoTime());
         
         try {
-            // Register for initial e-mail
-            BusEmail interimBus = new BusEmail(new ConnectionIMAP(connectionSettings, false),
-                                               initiator.getMailboxCheckInterval());
+            // Register for initial message
+            Bus interimBus = new BusEasyBackend(1, 1000, connectionSettings, Main.DEFAULT_MESSAGE_SIZE);
             
             interimBus.receive(new Scope(initiator.getModel().getStudyUID() + ROUND_0),
                                         new org.bihealth.mi.easybus.Participant(participant.name,
                                                                                 participant.emailAddress),
                                         new MessageListener() {
                                             @Override
-                                            public void receive(org.bihealth.mi.easybus.Message message) {
+                                            public void receive(String message) {
                                                 // Stop interim bus
                                                 interimBus.stop();
                                                 
@@ -123,15 +122,15 @@ public class UserParticipating extends User {
      * 
      * @param message
      */
-    private void performInitialization(org.bihealth.mi.easybus.Message message) {
+    private void performInitialization(String message) {
 
         try {
             // Get data
-            String data = Message.deserializeMessage((String) message.getMessage()).data;
+            String data = Message.deserializeMessage(message).data;
 
             // Init model
             setModel(MessageInitial.getAppModel(MessageInitial.decodeMessage(Message.getMessageData(data))));
-            getModel().setConnectionIMAPSettings(this.connectionSettings);
+            getModel().setConnectionSettings(this.connectionSettings);
 
             // Proceed to entering value
             getModel().toEnteringValues(data);

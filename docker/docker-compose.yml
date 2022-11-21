@@ -1,0 +1,74 @@
+version: "3.9"
+
+volumes:
+  eb_postgresql_data: {}
+
+networks:
+  easy_backend_service:
+    name: easy_backend_service
+    driver: bridge
+
+services:
+  eb-postgresql:
+    container_name: eb-postgresql
+    build:      
+      context: .
+      dockerfile: DOCKERFILE_POSTGRES
+    networks:
+      - easy_backend_service
+    environment:
+      - TZ=Europe/Berlin
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=easybackend
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - eb_postgresql_data:/var/lib/postgresql/data
+
+  eb-keycloak:
+    container_name: eb-keycloak
+    image:  quay.io/keycloak/keycloak:19.0.2-legacy
+    networks:
+      - easy_backend_service
+    environment:
+      - KEYCLOAK_LOGLEVEL=ERROR
+      - ROOT_LOGLEVEL=ERROR
+      - TZ=Europe/Berlin
+      - DB_VENDOR=POSTGRES
+      - DB_ADDR=eb-postgresql
+      - DB_DATABASE=keycloak
+      - DB_USER=postgres
+      - DB_PORT=5432
+      - DB_PASSWORD=admin
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - PROXY_ADDRESS_FORWARDING=true
+      - JDBC_PARAMS=useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Europe/Berlin
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9090:8080
+
+  eb-service:
+    container_name: eb-service
+    image: easybackend
+    networks:
+      - easy_backend_service
+    ports:
+      - 8080:8080
+    build:      
+      context: .
+      dockerfile: DOCKERFILE_SERVICE
+      
+  eb-driver:
+    container_name: eb-driver
+    image: eval-driver
+    networks:
+      - easy_backend_service
+    build:      
+      context: .
+      dockerfile: DOCKERFILE_DRIVER
+    environment:
+      - TC_DELAY_MS=30

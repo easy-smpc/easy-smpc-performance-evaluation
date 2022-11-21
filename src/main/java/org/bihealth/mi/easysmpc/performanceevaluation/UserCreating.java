@@ -36,7 +36,7 @@ public class UserCreating extends User {
 
     /** Logger */
     private static final Logger LOGGER             = LogManager.getLogger(UserCreating.class);
- 
+
     /** Participating users */
     private List<User>          participatingUsers = new ArrayList<>();
 
@@ -52,10 +52,10 @@ public class UserCreating extends User {
     public UserCreating(int numberParticipants,
                         int numberBins,
                         int mailboxCheckInterval,
-                        PerformanceMailboxSettings mailboxSettings,
+                        SettingsGenerator settingsGenerator,
                         PerformanceResultPrinter printer) throws IllegalStateException {
         
-        super(mailboxCheckInterval, mailboxSettings, printer);
+        super(mailboxCheckInterval, settingsGenerator, printer);
 
         try {          
             // Set model to starting
@@ -63,8 +63,8 @@ public class UserCreating extends User {
             
             // Init model with generated study name, participants and bins 
             getModel().toInitialSending(createRandomString(FIXED_LENGTH_STRING),
-                                        createParticpants(numberParticipants, mailboxSettings, FIXED_LENGTH_STRING),
-                                        createBins(numberBins,numberParticipants, FIXED_LENGTH_STRING), mailboxSettings.getConnection(0));
+                                        createParticpants(numberParticipants, settingsGenerator, FIXED_LENGTH_STRING),
+                                        createBins(numberBins,numberParticipants, FIXED_LENGTH_STRING), settingsGenerator.getConnection(0));
             // Init recording
             getRecorder().addStartTime(getModel().getOwnId(), System.nanoTime());
             LOGGER.debug("Started", new Date(), getModel().getStudyUID(), "started", getModel().getNumParticipants(), "participants", getModel().getBins().length, "bins", mailboxCheckInterval, "mailbox check interval");
@@ -75,7 +75,7 @@ public class UserCreating extends User {
         }
         
         // Spawn participants
-        participatingUsers = createParticipatingUsers(FIXED_LENGTH_BIT_NUMBER, mailboxSettings);
+        participatingUsers = createParticipatingUsers(FIXED_LENGTH_BIT_NUMBER, settingsGenerator);
         
         // Spawns the common steps in an own thread
         new Thread(new Runnable() {
@@ -91,7 +91,7 @@ public class UserCreating extends User {
      * 
      * @return
      */
-    public boolean areAllUsersFinished() {        
+    public boolean areAllUsersFinished() {
         
         // Check for this creating users
         if (!isProcessFinished()) {
@@ -141,7 +141,7 @@ public class UserCreating extends User {
      * @param connectionIMAPSettings 
      */
     private List<User> createParticipatingUsers(int bitLengthNumber,
-                                                PerformanceMailboxSettings mailBoxDetails) {
+                                                SettingsGenerator mailBoxDetails) {
 
         // Result
         List<User> result = new ArrayList<>();
@@ -163,7 +163,7 @@ public class UserCreating extends User {
      * @param stringLength length of names and e-mail address parts
      * @return
      */
-    private Participant[] createParticpants(int numberParticipants, PerformanceMailboxSettings mailBoxDetails, int stringLength) {
+    private Participant[] createParticpants(int numberParticipants, SettingsGenerator mailBoxDetails, int stringLength) {
 
         // Init result
         Participant[] result = new Participant[numberParticipants];
@@ -172,7 +172,7 @@ public class UserCreating extends User {
         for(int index = 0; index < numberParticipants; index++) {            
             
             // Create participant   
-            result[index] = new Participant(createRandomString(15), mailBoxDetails.getConnection(index).getEmailAddress());
+            result[index] = new Participant(mailBoxDetails.getConnection(index).getSelf().getName(), mailBoxDetails.getConnection(index).getSelf().getEmailAddress());
         }
         
         // Return

@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.bihealth.mi.easybus.BusException;
 import org.bihealth.mi.easybus.MessageListener;
 import org.bihealth.mi.easybus.Scope;
-import org.bihealth.mi.easysmpc.dataimport.ImportClipboard;
 import org.bihealth.mi.easysmpc.resources.Resources;
 
 import de.tu_darmstadt.cbs.emailsmpc.Bin;
@@ -45,26 +44,26 @@ import de.tu_darmstadt.cbs.emailsmpc.Study.StudyState;
 public abstract class User implements MessageListener {
 
     /** Logger */
-    private static final Logger        LOGGER                  = LogManager.getLogger(User.class);
+    private static final Logger      LOGGER                  = LogManager.getLogger(User.class);
     /** The length of a generated string */
-    public static final int            FIXED_LENGTH_STRING     = 10;
+    public static final int          FIXED_LENGTH_STRING     = 10;
     /** The length of a generated number before the point */
-    public static final int            FIXED_LENGTH_BIT_NUMBER = 31;
+    public static final int          FIXED_LENGTH_BIT_NUMBER = 31;
     /** Round for initial e-mails */
-    public static final String         ROUND_0                 = "_round0";
-    
+    public static final String       ROUND_0                 = "_round0";
+
     /** The study model */
-    private Study                      model                   = new Study();
+    private Study                    model                   = new Study();
     /** The random object */
-    private final SecureRandom         randomGenerator         = new SecureRandom();
+    private final SecureRandom       randomGenerator         = new SecureRandom();
     /** The mailbox check interval in milliseconds */
-    private final int                  mailBoxCheckInterval;
+    private final int                mailBoxCheckInterval;
     /** Is shared mailbox used? */
-    private PerformanceMailboxSettings mailboxSettings;
+    private SettingsGenerator        settingsGenerator;
     /** Store the time differences */
-    private PerformanceRecorder        recording;
+    private PerformanceRecorder      recording;
     /** Printer */
-    private PerformanceResultPrinter   printer;
+    private PerformanceResultPrinter printer;
 
     /**
      * Creates a new instance for creating users
@@ -74,11 +73,11 @@ public abstract class User implements MessageListener {
      * @param printer
      */
     public User(int mailboxCheckInterval,
-                PerformanceMailboxSettings mailboxSettings,
+                SettingsGenerator mailboxSettings,
                 PerformanceResultPrinter printer) {
         
         this.mailBoxCheckInterval = mailboxCheckInterval;
-        this.mailboxSettings = mailboxSettings;
+        this.settingsGenerator = mailboxSettings;
         this.printer = printer;
         this.recording = new PerformanceRecorder(model);
      }
@@ -91,7 +90,7 @@ public abstract class User implements MessageListener {
     public User(User other) {
         
         this.mailBoxCheckInterval = other.mailBoxCheckInterval;
-        this.mailboxSettings = other.mailboxSettings;
+        this.settingsGenerator = other.settingsGenerator;
         this.printer = other.printer;
         this.recording = other.recording;
      }
@@ -107,8 +106,8 @@ public abstract class User implements MessageListener {
      * Returns the mailbox settings
      * @return
      */
-    public PerformanceMailboxSettings getMailboxSettings() {
-        return mailboxSettings;
+    public SettingsGenerator getMailboxSettings() {
+        return settingsGenerator;
     }
     
     /**
@@ -140,14 +139,13 @@ public abstract class User implements MessageListener {
     }
     
     @Override
-    public void receive(org.bihealth.mi.easybus.Message message) {
-        String messageStripped = ImportClipboard.getStrippedExchangeMessage((String) message.getMessage());
+    public void receive(String message) {
         
         // Check if valid
-        if (isMessageShareResultValid(messageStripped)) {
+        if (isMessageShareResultValid(message)) {
             try {
                 // Set message
-                model.setShareFromMessage(Message.deserializeMessage(messageStripped));
+                model.setShareFromMessage(Message.deserializeMessage(message));
             } catch (IllegalStateException | IllegalArgumentException | NoSuchAlgorithmException | ClassNotFoundException | IOException e) {
                 LOGGER.error("Unable to digest message logged", new Date(), "Unable to digest message", ExceptionUtils.getStackTrace(e));
             }
@@ -207,10 +205,10 @@ public abstract class User implements MessageListener {
                           recording.getFastest(),
                           recording.getSlowest(),
                           recording.getMean(),
-                          mailboxSettings.getTracker().getNumberMessagesReceived(),
-                          mailboxSettings.getTracker().getTotalSizeMessagesReceived(),
-                          mailboxSettings.getTracker().getNumberMessagesSent(),
-                          mailboxSettings.getTracker().getTotalsizeMessagesSent());
+                          settingsGenerator.getTracker().getNumberMessagesReceived(),
+                          settingsGenerator.getTracker().getTotalSizeMessagesReceived(),
+                          settingsGenerator.getTracker().getNumberMessagesSent(),
+                          settingsGenerator.getTracker().getTotalsizeMessagesSent());
             
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write performance results", e);
@@ -281,13 +279,13 @@ public abstract class User implements MessageListener {
 
                 try {
                     // Retrieve bus and send message
-                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, false).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
+                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, false).send(Message.serializeMessage(getModel().getUnsentMessageFor(index)),
                                     new Scope(getModel().getStudyUID() + (getModel().getState() == StudyState.INITIAL_SENDING ? ROUND_0 : roundIdentifier)),
                                     new org.bihealth.mi.easybus.Participant(getModel().getParticipants()[index].name,
                                                                             getModel().getParticipants()[index].emailAddress));
                     
                     // Wait for result with a timeout time
-                    future.get(Resources.TIMEOUT_SEND_EMAILS, TimeUnit.MILLISECONDS);
+                    future.get(Resources.TIMEOUT_EASYBACKEND, TimeUnit.MILLISECONDS);
                     
                     // Mark message as sent
                     model.markMessageSent(index);

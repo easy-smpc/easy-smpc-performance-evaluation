@@ -1,3 +1,4 @@
+REMOVE?
 docker run ^
 	--rm ^
 	--name easy-eval ^

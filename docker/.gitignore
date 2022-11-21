@@ -1,3 +1,2 @@
-/clamav/
-easy-smpc-evaluation.jar
-/easy-smpc-performance-evaluation-1.0.jar
+./key.pem
+*.pem

@@ -1,14 +1,15 @@
 FROM adoptopenjdk:14-jre-hotspot-bionic
 
 # Install
-RUN apt-get update && apt-get install -y dos2unix
+#RUN apt-get update && apt-get install -y dos2unix
 
 # Copy files
 WORKDIR /root
 COPY easy-smpc-performance-evaluation-1.0.jar ./easy-smpc/easy-smpc-performance-evaluation-1.0.jar
 COPY createEval.sh /root/createEval.sh
 COPY wait-for-it.sh /root/wait-for-it.sh
-RUN dos2unix /root/createEval.sh
+RUN chmod +x /root/createEval.sh
+RUN chmod +x /root/wait-for-it.sh
 
 # Define entrypoint and cmd
 CMD /root/createEval.sh

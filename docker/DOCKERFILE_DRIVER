@@ -1,7 +1,7 @@
 FROM adoptopenjdk:14-jre-hotspot-bionic
 
 # Install
-#RUN apt-get update && apt-get install -y dos2unix
+RUN apt-get update && apt-get install -y iproute2
 
 # Copy files
 WORKDIR /root

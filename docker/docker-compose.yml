@@ -72,3 +72,5 @@ services:
       dockerfile: DOCKERFILE_DRIVER
     environment:
       - TC_DELAY_MS=30
+    cap_add:
+      - NET_ADMIN

@@ -4,8 +4,8 @@
 /root/wait-for-it.sh eb-keycloak:8080 --timeout=30 --strict -- echo "keylcloak is up"
 
 #Set delay in network traffic
-echo "Set network delay to $(($TC_DELAY_MS/2))ms"
-tc qdisc add dev lo root netem delay $(($TC_DELAY_MS/2))"ms"
+echo "Set network delay to $TC_DELAY_MSms"
+tc qdisc add dev eth0 root netem delay $TC_DELAY_MS"ms"
 
 # Start evaluation
 echo "Start evaluation"

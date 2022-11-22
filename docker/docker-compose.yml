@@ -4,18 +4,16 @@ volumes:
   eb_postgresql_data: {}
 
 networks:
-  easy_backend_service:
-    name: easy_backend_service
+  eb-performance-evaluation:
+    name: eb-performance-evaluation
     driver: bridge
 
 services:
   eb-postgresql:
     container_name: eb-postgresql
-    build:      
-      context: .
-      dockerfile: DOCKERFILE_POSTGRES
+    image: postgres:14.1-alpine
     networks:
-      - easy_backend_service
+      - eb-performance-evaluation
     environment:
       - TZ=Europe/Berlin
       - POSTGRES_USER=postgres
@@ -25,12 +23,14 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - eb_postgresql_data:/var/lib/postgresql/data
+      - ./easybackend.sql:/docker-entrypoint-initdb.d/easybackend.sql
+      - ./keycloak.sql:/docker-entrypoint-initdb.d/keycloak.sql
 
   eb-keycloak:
     container_name: eb-keycloak
     image:  quay.io/keycloak/keycloak:19.0.2-legacy
     networks:
-      - easy_backend_service
+      - eb-performance-evaluation
     environment:
       - KEYCLOAK_LOGLEVEL=ERROR
       - ROOT_LOGLEVEL=ERROR
@@ -55,7 +55,7 @@ services:
     container_name: eb-service
     image: easybackend
     networks:
-      - easy_backend_service
+      - eb-performance-evaluation
     ports:
       - 8080:8080
     build:      
@@ -66,7 +66,7 @@ services:
     container_name: eb-driver
     image: eval-driver
     networks:
-      - easy_backend_service
+      - eb-performance-evaluation
     build:      
       context: .
       dockerfile: DOCKERFILE_DRIVER

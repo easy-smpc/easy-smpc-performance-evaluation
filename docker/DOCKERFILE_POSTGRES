@@ -1,5 +1,0 @@
-FROM postgres:14.1-alpine
-
-# TODO Remove keycloak
-COPY easybackend.sql /docker-entrypoint-initdb.d/easybackend.sql
-COPY keycloak.sql /docker-entrypoint-initdb.d/keycloak.sql

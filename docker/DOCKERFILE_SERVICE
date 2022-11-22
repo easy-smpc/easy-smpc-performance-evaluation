@@ -7,10 +7,12 @@ WORKDIR /home/spring
 
 COPY application.yml .
 COPY entrypoint.sh entrypoint.sh
+COPY wait-for-it.sh .
 ADD  easy-backend.jar .
 
 RUN chmod 664 -R * && \
     chmod +x entrypoint.sh && \
+    chmod +x wait-for-it.sh && \
     chmod 775 easy-backend.jar && \
     chown -R spring:spring *
 

@@ -346,7 +346,7 @@ public abstract class User implements MessageListener {
             // Receives the messages for the second round, stops the bus and finalizes the model
             receiveMessages(Resources.ROUND_2);
             getModel().stopBus();
-            recording.addFinishedTime(this.model.getOwnId(), System.nanoTime());
+            recording.addFinishedTime(this.model.getOwnId(), System.currentTimeMillis());
             if (recording.isDone()) {
                 printResults();
             }

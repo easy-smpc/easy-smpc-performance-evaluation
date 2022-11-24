@@ -66,7 +66,7 @@ public class UserCreating extends User {
                                         createParticpants(numberParticipants, settingsGenerator, FIXED_LENGTH_STRING),
                                         createBins(numberBins,numberParticipants, FIXED_LENGTH_STRING), settingsGenerator.getConnection(0));
             // Init recording
-            getRecorder().addStartTime(getModel().getOwnId(), System.nanoTime());
+            getRecorder().addStartTime(getModel().getOwnId(), System.currentTimeMillis());
             LOGGER.debug("Started", new Date(), getModel().getStudyUID(), "started", getModel().getNumParticipants(), "participants", getModel().getBins().length, "bins", mailboxCheckInterval, "mailbox check interval");
             
         } catch (IOException | IllegalStateException e) {

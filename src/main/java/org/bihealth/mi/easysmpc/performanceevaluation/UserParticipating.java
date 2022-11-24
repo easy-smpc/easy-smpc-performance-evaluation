@@ -61,7 +61,7 @@ public class UserParticipating extends User {
         Participant participant = initiator.getModel().getParticipants()[participantID];
         
         // Init time recording
-        getRecorder().addStartTime(participantID, System.nanoTime());
+        getRecorder().addStartTime(participantID, System.currentTimeMillis());
         
         try {
             // Register for initial message

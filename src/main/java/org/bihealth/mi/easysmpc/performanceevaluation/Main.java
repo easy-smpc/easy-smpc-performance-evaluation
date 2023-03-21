@@ -23,9 +23,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bihealth.mi.easybus.BusException;
+import org.bihealth.mi.easybus.MessageFilter;
+import org.bihealth.mi.easybus.PasswordStore;
 import org.bihealth.mi.easybus.implementations.email.BusEmail;
 import org.bihealth.mi.easybus.implementations.email.ConnectionIMAP;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
+import org.bihealth.mi.easybus.implementations.email.ConnectionSettingsIMAP;
 import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
 
 /**
@@ -63,12 +65,13 @@ public class Main {
 		PerformanceTracker tracker = new PerformanceTracker();
 
         // Create connection settings
-        ConnectionIMAPSettings connectionIMAPSettings = new ConnectionIMAPSettings(
-                "easy" + PerformanceMailboxSettings.INDEX_REPLACE + "@easysmpc.org", null).setPassword("12345").setSMTPServer("localhost")
+        ConnectionSettingsIMAP connectionSettingsIMAP = new ConnectionSettingsIMAP(
+                "easy" + PerformanceMailboxSettings.INDEX_REPLACE + "@easysmpc.org", null).setSMTPServer("localhost")
                         .setIMAPServer("localhost").setIMAPPort(993).setSMTPPort(465)
                         .setAcceptSelfSignedCertificates(true).setSearchForProxy(false).setPerformanceListener(tracker);
+        connectionSettingsIMAP.setPasswordStore(new PasswordStore("12345"));
 
-		// Create parameters
+        // Create parameters
 		List<Integer> participants = new ArrayList<>(Arrays.asList(new Integer[] { 20, 15, 10, 5, 3 }));
 		List<Integer> bins = new ArrayList<>(Arrays.asList(new Integer[] { 10000, 7500, 5000, 2500, 1000 }));
 		List<Integer> mailboxCheckInterval = new ArrayList<>(Arrays.asList(new Integer[] { 20000, 15000, 10000, 5000, 1000 }));
@@ -77,15 +80,21 @@ public class Main {
 		Combinator combinator = new CombinatorRepeatPermute(participants, bins, mailboxCheckInterval, repetitionsPerCombination);
 
 		// Create mailbox details
-		PerformanceMailboxSettings mailboxSettings = new PerformanceMailboxSettings(connectionIMAPSettings, participants, tracker);
+		PerformanceMailboxSettings mailboxSettings = new PerformanceMailboxSettings(connectionSettingsIMAP, participants, tracker);
 
         // Prepare mailbox
         try {
 
             // Delete existing e-mails relevant to EasySMPC
-            for (ConnectionIMAPSettings imapConnectionSettings : mailboxSettings.getAllConnections()) {
+            for (ConnectionSettingsIMAP imapConnectionSettings : mailboxSettings.getAllConnections()) {
                 BusEmail bus = new BusEmail(new ConnectionIMAP(imapConnectionSettings, false), 1000);
-                bus.purgeEmails();
+                bus.purge(new MessageFilter() {
+                    
+                    @Override
+                    public boolean accepts(String messageDescription) {
+                        return true;
+                    }
+                });
                 bus.stop();
             }
 

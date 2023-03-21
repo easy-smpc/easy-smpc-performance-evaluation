@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.bihealth.mi.easybus.BusException;
 import org.bihealth.mi.easybus.MessageListener;
 import org.bihealth.mi.easybus.Scope;
-import org.bihealth.mi.easysmpc.dataimport.ImportClipboard;
 import org.bihealth.mi.easysmpc.resources.Resources;
 
 import de.tu_darmstadt.cbs.emailsmpc.Bin;
@@ -140,14 +139,14 @@ public abstract class User implements MessageListener {
     }
     
     @Override
-    public void receive(org.bihealth.mi.easybus.Message message) {
-        String messageStripped = ImportClipboard.getStrippedExchangeMessage((String) message.getMessage());
+    public void receive(String message) {
+
         
         // Check if valid
-        if (isMessageShareResultValid(messageStripped)) {
+        if (isMessageShareResultValid(message)) {
             try {
                 // Set message
-                model.setShareFromMessage(Message.deserializeMessage(messageStripped));
+                model.setShareFromMessage(Message.deserializeMessage(message));
             } catch (IllegalStateException | IllegalArgumentException | NoSuchAlgorithmException | ClassNotFoundException | IOException e) {
                 LOGGER.error("Unable to digest message logged", new Date(), "Unable to digest message", ExceptionUtils.getStackTrace(e));
             }
@@ -281,13 +280,13 @@ public abstract class User implements MessageListener {
 
                 try {
                     // Retrieve bus and send message
-                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, false).send(new org.bihealth.mi.easybus.Message(Message.serializeMessage(getModel().getUnsentMessageFor(index))),
+                    FutureTask<Void> future = getModel().getBus(this.mailBoxCheckInterval, false).send(Message.serializeMessage(getModel().getUnsentMessageFor(index)),
                                     new Scope(getModel().getStudyUID() + (getModel().getState() == StudyState.INITIAL_SENDING ? ROUND_0 : roundIdentifier)),
                                     new org.bihealth.mi.easybus.Participant(getModel().getParticipants()[index].name,
                                                                             getModel().getParticipants()[index].emailAddress));
                     
                     // Wait for result with a timeout time
-                    future.get(Resources.TIMEOUT_SEND_EMAILS, TimeUnit.MILLISECONDS);
+                    future.get(Resources.TIMEOUT_SEND_EMAILS_DEFAULT, TimeUnit.MILLISECONDS);
                     
                     // Mark message as sent
                     model.markMessageSent(index);

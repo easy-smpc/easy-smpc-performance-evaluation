@@ -25,7 +25,7 @@ import org.bihealth.mi.easybus.MessageListener;
 import org.bihealth.mi.easybus.Scope;
 import org.bihealth.mi.easybus.implementations.email.BusEmail;
 import org.bihealth.mi.easybus.implementations.email.ConnectionIMAP;
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
+import org.bihealth.mi.easybus.implementations.email.ConnectionSettingsIMAP;
 
 import de.tu_darmstadt.cbs.emailsmpc.Message;
 import de.tu_darmstadt.cbs.emailsmpc.MessageInitial;
@@ -43,7 +43,7 @@ public class UserParticipating extends User {
     private static final Logger    LOGGER = LogManager.getLogger(UserParticipating.class);
 
     /** Connection settings */
-    private ConnectionIMAPSettings connectionSettings;
+    private ConnectionSettingsIMAP connectionSettings;
 
     /**
      * Creates a new instance
@@ -73,7 +73,7 @@ public class UserParticipating extends User {
                                                                                 participant.emailAddress),
                                         new MessageListener() {
                                             @Override
-                                            public void receive(org.bihealth.mi.easybus.Message message) {
+                                            public void receive(String message) {
                                                 // Stop interim bus
                                                 interimBus.stop();
                                                 
@@ -123,15 +123,15 @@ public class UserParticipating extends User {
      * 
      * @param message
      */
-    private void performInitialization(org.bihealth.mi.easybus.Message message) {
+    private void performInitialization(String message) {
 
         try {
-            // Get data
-            String data = Message.deserializeMessage((String) message.getMessage()).data;
-
+            // Get message
+            String data = Message.deserializeMessage(message).data;
+            
             // Init model
             setModel(MessageInitial.getAppModel(MessageInitial.decodeMessage(Message.getMessageData(data))));
-            getModel().setConnectionIMAPSettings(this.connectionSettings);
+            getModel().setConnectionSettings(this.connectionSettings);
 
             // Proceed to entering value
             getModel().toEnteringValues(data);

@@ -19,7 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bihealth.mi.easybus.implementations.email.ConnectionIMAPSettings;
+import org.bihealth.mi.easybus.PasswordStore;
+import org.bihealth.mi.easybus.implementations.email.ConnectionSettingsIMAP;
 
 /**
  * Stores the mailbox connections details
@@ -31,8 +32,8 @@ public class PerformanceMailboxSettings {
 
     /** Replace this by index */
     public static final String           INDEX_REPLACE = "REPLACE";
-    /** Template to create ConnectionIMAPSettings */
-    private final ConnectionIMAPSettings connectionIMAPTemplate;
+    /** Template to create ConnectionSettingsIMAP */
+    private final ConnectionSettingsIMAP connectionIMAPTemplate;
     /** Max participants */
     private Integer                      maxParticipants;
     /** Tracker */
@@ -45,7 +46,7 @@ public class PerformanceMailboxSettings {
      * @param participants
      * @param tracker
      */
-    public PerformanceMailboxSettings(ConnectionIMAPSettings connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {              
+    public PerformanceMailboxSettings(ConnectionSettingsIMAP connectionIMAPTemplate, List<Integer> participants, PerformanceTracker tracker) {              
         
         // Store       
         this.connectionIMAPTemplate = connectionIMAPTemplate;
@@ -59,9 +60,9 @@ public class PerformanceMailboxSettings {
      * 
      * @return
      */
-    public List<ConnectionIMAPSettings> getAllConnections() {
+    public List<ConnectionSettingsIMAP> getAllConnections() {
         // Init
-        Set<ConnectionIMAPSettings> connections = new HashSet<>();
+        Set<ConnectionSettingsIMAP> connections = new HashSet<>();
 
         // Get all connections with no duplicates
         for (int index = 0; index < this.maxParticipants; index++) {
@@ -78,20 +79,21 @@ public class PerformanceMailboxSettings {
      * @param index
      * @return
      */
-    public ConnectionIMAPSettings getConnection(int index) {
+    public ConnectionSettingsIMAP getConnection(int index) {
         
         // Replace        
-        String newEmail = connectionIMAPTemplate.getEmailAddress().replaceFirst(INDEX_REPLACE, String.valueOf(index));
+        String newEmail = connectionIMAPTemplate.getIMAPEmailAddress().replaceFirst(INDEX_REPLACE, String.valueOf(index));
         
         // Return object with new mail address
-        return new ConnectionIMAPSettings(newEmail, null).setPassword(connectionIMAPTemplate.getPassword(false))
+        return (ConnectionSettingsIMAP) new ConnectionSettingsIMAP(newEmail, null)
                                                    .setIMAPPort(connectionIMAPTemplate.getIMAPPort())
                                                    .setIMAPServer(connectionIMAPTemplate.getIMAPServer())
                                                    .setSMTPServer(connectionIMAPTemplate.getSMTPServer())
                                                    .setSMTPPort(connectionIMAPTemplate.getSMTPPort())
                                                    .setAcceptSelfSignedCertificates(true)
                                                    .setSearchForProxy(false)
-                                                   .setPerformanceListener(tracker);
+                                                   .setPerformanceListener(tracker)
+                                                   .setPasswordStore(new PasswordStore("12345"));
     }
     
     /**

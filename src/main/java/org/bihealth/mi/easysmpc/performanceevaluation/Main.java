@@ -28,6 +28,7 @@ import org.bihealth.mi.easybus.PasswordStore;
 import org.bihealth.mi.easybus.implementations.email.BusEmail;
 import org.bihealth.mi.easybus.implementations.email.ConnectionIMAP;
 import org.bihealth.mi.easybus.implementations.email.ConnectionSettingsIMAP;
+import org.bihealth.mi.easysmpc.App;
 import org.bihealth.mi.easysmpc.performanceevaluation.Combinator.Combination;
 
 /**
@@ -53,7 +54,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 	    
 	    // Output start message
-        System.out.println("Performance evaluation started");
+        System.out.println(String.format("Performance evaluation started with version %s", App.VERSION));
         System.out.println("For results see /root/easy-smpc/"+ FILEPATH);
         
         PerformanceResultPrinter printer = new PerformanceResultPrinter(FILEPATH);

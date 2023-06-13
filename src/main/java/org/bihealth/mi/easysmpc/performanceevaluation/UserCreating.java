@@ -172,7 +172,7 @@ public class UserCreating extends User {
         for(int index = 0; index < numberParticipants; index++) {            
             
             // Create participant   
-            result[index] = new Participant(mailBoxDetails.getConnection(index).getSelf().getName(), mailBoxDetails.getConnection(index).getSelf().getEmailAddress());
+            result[index] = new Participant(mailBoxDetails.getSelf(index).getName(), mailBoxDetails.getSelf(index).getEmailAddress());
         }
         
         // Return

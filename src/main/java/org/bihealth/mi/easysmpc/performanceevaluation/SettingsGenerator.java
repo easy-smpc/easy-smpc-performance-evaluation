@@ -83,20 +83,30 @@ public class SettingsGenerator {
      */
     public ConnectionSettingsEasyBackend getConnection(int index) {
         
-        
-        
-        // Replace
-        String newName = connectionTemplate.getSelf().getName().replaceFirst(INDEX_REPLACE, String.valueOf(index));
-        String newEmail = connectionTemplate.getSelf().getEmailAddress().replaceFirst(INDEX_REPLACE, String.valueOf(index));
-        
         // Return new connection
-        try {
-            return (ConnectionSettingsEasyBackend) new ConnectionSettingsEasyBackend(new Participant(newName, newEmail), null)
+            return (ConnectionSettingsEasyBackend) new ConnectionSettingsEasyBackend(getSelf(index).getEmailAddress(), null)
                     .setAPIServer(connectionTemplate.getAPIServer())
                     .setAuthServer(connectionTemplate.getAuthServer())
                     .setListener(tracker)
                     .setMaxMessageSize(connectionTemplate.getMaxMessageSize())
                     .setPasswordStore(new PasswordStore(connectionTemplate.getPasswordStore().getFirstPassword()));
+    }
+    
+    /**
+     * Returns the self object for a given index
+     * 
+     * @param index
+     * @return
+     */
+    public Participant getSelf(int index) {
+
+        // Replace
+        String email = connectionTemplate.getIdentifier()
+                                           .replaceFirst(INDEX_REPLACE, String.valueOf(index));
+        String  name = email.substring(0, email.indexOf("@"));
+
+        try {
+            return new Participant(name, email);
         } catch (BusException e) {
             throw new IllegalStateException("Particpants could not be created");
         }

@@ -59,13 +59,13 @@ public class UserParticipating extends User {
         // Settings
         connectionSettings = initiator.getMailboxSettings().getConnection(participantID);
         Participant participant = initiator.getModel().getParticipants()[participantID];
-        
+
         // Init time recording
         getRecorder().addStartTime(participantID, System.currentTimeMillis());
         
         try {
             // Register for initial message
-            Bus interimBus = new BusEasyBackend(1, 1000, connectionSettings, Main.DEFAULT_MESSAGE_SIZE);
+            Bus interimBus = new BusEasyBackend(1, 1000, connectionSettings, new org.bihealth.mi.easybus.Participant(participant.name, participant.emailAddress), Main.DEFAULT_MESSAGE_SIZE);
             
             interimBus.receive(new Scope(initiator.getModel().getStudyUID() + ROUND_0),
                                         new org.bihealth.mi.easybus.Participant(participant.name,

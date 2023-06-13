@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 import org.bihealth.mi.easybus.Bus;
 import org.bihealth.mi.easybus.BusException;
 import org.bihealth.mi.easybus.MessageFilter;
-import org.bihealth.mi.easybus.Participant;
 import org.bihealth.mi.easybus.PasswordStore;
 import org.bihealth.mi.easybus.implementations.http.easybackend.BusEasyBackend;
 import org.bihealth.mi.easybus.implementations.http.easybackend.ConnectionSettingsEasyBackend;
@@ -72,9 +71,7 @@ public class Main {
 		
 		
         // Create connection settings
-        ConnectionSettingsEasyBackend connectionSettingsTemplate = new ConnectionSettingsEasyBackend(new Participant("easy" + SettingsGenerator.INDEX_REPLACE,
-                                                                                                             "easy" + SettingsGenerator.INDEX_REPLACE + "@easysmpc.org"),
-                                                                                             null)
+        ConnectionSettingsEasyBackend connectionSettingsTemplate = new ConnectionSettingsEasyBackend("easy" + SettingsGenerator.INDEX_REPLACE + "@easysmpc.org", null)
                 .setAPIServer(new URL("http://eb-service:8080"))
                 .setAuthServer(new URL("http://eb-keycloak:8080"))
                 .setMaxMessageSize(DEFAULT_MESSAGE_SIZE);
@@ -94,8 +91,8 @@ public class Main {
         // Prepare mailbox
         try {
 
-            // Delete existing e-mails relevant to EasySMPC
-            Bus bus = new BusEasyBackend(1, 1000, settingsGenerator.getConnection(0), Main.DEFAULT_MESSAGE_SIZE);
+            // Delete existing messages relevant to EasySMPC
+            Bus bus = new BusEasyBackend(1, 1000, settingsGenerator.getConnection(0), settingsGenerator.getSelf(0), Main.DEFAULT_MESSAGE_SIZE);
             bus.purge(new MessageFilter() {
 
                 @Override

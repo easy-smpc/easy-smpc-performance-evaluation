@@ -1,8 +1,5 @@
 FROM adoptopenjdk:14-jre-hotspot-bionic
 
-# Install
-RUN apt-get update && apt-get install -y iproute2
-
 # Copy files
 WORKDIR /root
 COPY easy-smpc-performance-evaluation-1.0.jar ./easy-smpc/easy-smpc-performance-evaluation-1.0.jar

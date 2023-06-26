@@ -1,15 +1,15 @@
 # Performance evaluation of the software EasySMPC
 
 > This repository allows to reproduce the performance evaluation of the software [EasySMPC](https://github.com/prasser/easy-smpc) in a dockerized form. This branch contains the evaluation with the e-mail server  [iRedMail](https://www.iredmail.org/). For the performance evaluation of EasySMPC's own backend [EasyBackend](https://github.com/easy-smpc/easy-backend) please switch to the [respective branch](https://github.com/easy-smpc/easy-smpc-performance-evaluation/tree/easybackend) in this repository.
-> The result of a run of the evaluation are stored in the folder `results`.
+> The results of previous runs of the evaluation are stored in the folder `results`.
 ---
 
 ## Steps to reproduce the performance evaluation
 1. Clone this repository with the command `clone https://github.com/fnwirth/easy-smpc-performance-evaluation`.
 1. Build the program with the command `mvn clean package`. The two warnings regarding the import of easy-smpc.jar can be ignored.
-1. Create the docker image by changing to the folder *docker* and executing the script `createDockerImage.sh` or `createDockerImage.bat` respectively
-1. Start the docker image with the script `startEvaluation.sh` or `startEvaluation.bat`. To change the network delay, the parameter *TC_DELAY_MS* can adapted before starting the script.
-1. The performance evaluation is running and can be inspected with the command `docker logs easy-eval`. The results can be accessed in the file */root/easy-smpc/result.csv* within the container e.g. by copying the file to the host with the command `docker cp easy-eval:/root/easy-smpc/result.csv .`
+1. Create the docker image by changing to the folder *docker* and executing the script `createDockerImage.sh` or `createDockerImage.bat` respectively.
+1. Start the docker image with the script `startEvaluation.sh` or `startEvaluation.bat`. To change the simulated network delay, the parameter *TC_DELAY_MS* can adapted before starting the script.
+1. The performance evaluation is running and can be inspected with the command `docker logs easy-eval`. The results can be accessed in the file */root/easy-smpc/result.csv* within the container e.g. by copying the file to the host with the command `docker cp easy-eval:/root/easy-smpc/performanceEvaluation.csv .`
 
 ## Troubleshooting
 ### Latency created with *tc*
